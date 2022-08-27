@@ -9,13 +9,11 @@ import {
     Rate,
     Trend
 } from "k6/metrics";
-import {
-    randomIntBetween
-} from "./utils/k6-utils.js";
+
 
 const loginData = JSON.parse(open("./utils/users.json"));
 
-const url = 'http://seller.irantic.test/api/v1/';
+const BASE_URL = 'http://seller.irantic.test/api/v1/';
 
 const params = {
     headers: {
@@ -55,8 +53,8 @@ let timeToFirstByte = new Trend("time_to_first_byte", true);
 
 export default function () {
     group("schedule", function () {
-        let res = http.get(url + "schedule?show_id=45001", params);
-        
+        let res = http.get(BASE_URL + "schedule?show_id=45001", params);
+
         check(res, {
             'is status 200': (r) => r.status === 200,
         });

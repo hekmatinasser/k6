@@ -11,8 +11,8 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '10s',
             stages: [{
-                    target: 100,
-                    duration: '30s'
+                    target: 1000,
+                    duration: '1m'
                 },
                 // {
                 //     target: 20,
@@ -141,79 +141,7 @@ export function Scenario_1() {
                     },
                 }
             )
-            response = http.get(Base_URL + 'assets/style/grids.css')
-            response = http.get(Base_URL + 'assets/vue.js')
-            response = http.get(Base_URL + 'assets/style/default.css?v=1811')
-            response = http.get(Base_URL + 'assets/style/show.css?v=1811')
-            response = http.get(Base_URL + 'assets/style/Desktop/default_1366.css?v=1811')
-            response = http.get(Base_URL + 'assets/style/Desktop/show_1366.css?v=1811')
-            response = http.get(Base_URL + 'assets/icons/city/unknown.svg')
-            response = http.get(Base_URL + 'assets/icons/login_phone.svg')
-            response = http.get(Base_URL + 'assets/icons/login_otp.svg')
-            response = http.get(Base_URL + 'assets/icons/login_password.svg')
-            response = http.get(Base_URL + 'assets/icons/login_forget_password.svg')
-            response = http.get(Base_URL + 'assets/icons/login_change_password.svg')
-            response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/special_pattern.svg')
-            response = http.get(Base_URL + 'assets/icons/no_data.svg')
-            response = http.get(Base_URL + 'assets/icons/no_result_found.svg')
-            response = http.get(Base_URL + 'assets/icons/irantic_logo_sign.svg')
-            response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg')
-            response = http.get(Base_URL + 'assets/icons/track_order.svg')
-            response = http.get(Base_URL + 'assets/icons/faq.svg')
-            response = http.get(Base_URL + 'assets/js/show.js?v=1811')
-            response = http.get(Base_URL + 'assets/JsBarcode.js')
-            response = http.get(Base_URL + 'assets/icons/city/all_province.svg')
-            response = http.get(Base_URL + 'assets/icons/city/province_1.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_2.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_3.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_4.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_5.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_6.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_7.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_8.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_9.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_10.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_11.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_12.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_13.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_14.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_15.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_16.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_17.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_18.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_19.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_20.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_21.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_22.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_23.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_24.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_25.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_26.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_27.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_28.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_29.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_30.svg?v=1')
-            response = http.get(Base_URL + 'assets/icons/city/province_31.svg?v=1')
-            response = http.get(Base_URL + 'assets/fonts/Shabnam-Bold-FD.ttf', {
-                headers: {
-                    origin: Base_URL,
-                },
-            })
-            response = http.get(Base_URL + 'assets/fonts/Shabnam-FD.ttf', {
-                headers: {
-                    origin: Base_URL,
-                },
-            })
-            response = http.get(Base_URL + 'assets/fonts/irantic.ttf', {
-                headers: {
-                    origin: Base_URL,
-                },
-            })
-            response = http.get(Base_URL + 'assets/icons/place_holder.svg')
-            response = http.get(Base_URL + 'assets/icons/audience_club.svg')
-            response = http.get(Base_URL + 'assets/icons/wallet.svg')
-            response = http.get(Base_URL + 'assets/icons/profile.svg')
+
             response = http.get(
                 Base_URL_Panel + 'storage/show/banner/m3Wssl7mNLURxFFNBhvT2IOye6ioTyJpDqrdhPZP.jpg'
             )
@@ -240,86 +168,13 @@ export function Scenario_1() {
                 'upgrade-insecure-requests': '1',
             },
         })
-
-        response = http.get(Base_URL + 'assets/style/grids.css')
-        response = http.get(Base_URL + 'assets/vue.js')
-        response = http.get(Base_URL + 'assets/style/default.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/order.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/Desktop/default_1366.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/Desktop/order_1366.css?v=1811')
-        response = http.get(Base_URL + 'assets/icons/city/unknown.svg')
-        response = http.get(Base_URL + 'assets/icons/login_phone.svg')
-        response = http.get(Base_URL + 'assets/icons/login_otp.svg')
-        response = http.get(Base_URL + 'assets/icons/login_password.svg')
-        response = http.get(Base_URL + 'assets/icons/login_forget_password.svg')
-        response = http.get(Base_URL + 'assets/icons/login_change_password.svg')
-        response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/irantic_logo_sign.svg')
-        response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg')
-        response = http.get(Base_URL + 'assets/icons/track_order.svg')
-        response = http.get(Base_URL + 'assets/icons/faq.svg')
-        response = http.get(Base_URL + 'assets/js/order.js?v=1811')
-        response = http.get(Base_URL + 'assets/JsBarcode.js')
-        response = http.get(Base_URL + 'assets/icons/city/all_province.svg')
-        response = http.get(Base_URL + 'assets/icons/city/province_1.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_2.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_3.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_4.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_5.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_6.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_7.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_8.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_9.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_10.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_11.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_12.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_13.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_14.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_15.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_16.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_17.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_18.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_19.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_20.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_21.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_22.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_23.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_24.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_25.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_26.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_27.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_28.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_29.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_30.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_31.svg?v=1')
-        response = http.get(Base_URL + 'assets/fonts/Shabnam-Bold-FD.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/fonts/Shabnam-FD.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/fonts/irantic.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/icons/place_holder.svg')
-        response = http.get(Base_URL + 'assets/icons/audience_club.svg')
-        response = http.get(Base_URL + 'assets/icons/wallet.svg')
-        response = http.get(Base_URL + 'assets/icons/profile.svg')
         response = http.get(Base_URL + 'api/user/wallet', {
             headers: {
                 accept: 'application/json',
                 authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
             },
         })
-        response = http.get(Base_URL + 'assets/icons/toman_regular_light.svg')
-        response = http.get(Base_URL + 'assets/icons/toman_regular_dark.svg')
-        response = http.get(Base_URL + 'assets/icons/toman_regular_gray.svg')
+
 
         response = http.get(
             Base_URL + 'api/schedule/dates?show_id=45001&place_id=1551&date=2022-09-13', {
@@ -348,7 +203,7 @@ export function Scenario_1() {
                 },
             }
         )
-        sleep(3)
+        sleep(1)
     })
 
     group('Ticket', function () {
@@ -357,85 +212,6 @@ export function Scenario_1() {
                 'upgrade-insecure-requests': '1',
             },
         })
-        response = http.get(Base_URL + 'assets/style/grids.css')
-        response = http.get(Base_URL + 'assets/vue.js')
-        response = http.get(Base_URL + 'assets/style/default.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/ticket.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/Desktop/default_1366.css?v=1811')
-        response = http.get(Base_URL + 'assets/style/Desktop/ticket_1366.css?v=1811')
-        response = http.get(Base_URL + 'assets/icons/city/unknown.svg')
-        response = http.get(Base_URL + 'assets/icons/login_phone.svg')
-        response = http.get(Base_URL + 'assets/icons/login_otp.svg')
-        response = http.get(Base_URL + 'assets/icons/login_password.svg')
-        response = http.get(Base_URL + 'assets/icons/login_forget_password.svg')
-        response = http.get(Base_URL + 'assets/icons/login_change_password.svg')
-        response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/irantic_logo_sign.svg')
-        response = http.get(Base_URL + 'assets/logo/irantic_logo_light.svg')
-        response = http.get(Base_URL + 'assets/icons/track_order.svg')
-        response = http.get(Base_URL + 'assets/icons/faq.svg')
-        response = http.get(Base_URL + 'assets/js/ticket.js?v=1811')
-        response = http.get(Base_URL + 'assets/JsBarcode.js')
-        response = http.get(Base_URL + 'assets/icons/audience_club.svg')
-        response = http.get(Base_URL + 'assets/icons/toman_regular_light.svg')
-        response = http.get(Base_URL + 'assets/icons/wallet.svg')
-        response = http.get(Base_URL + 'assets/icons/place_holder.svg')
-        response = http.get(Base_URL + 'assets/icons/download_light.svg')
-        response = http.get(Base_URL + 'assets/fonts/Shabnam-FD.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/fonts/irantic.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/fonts/Shabnam-Bold-FD.ttf', {
-            headers: {
-                origin: Base_URL,
-            },
-        })
-        response = http.get(Base_URL + 'assets/icons/profile.svg')
-        response = http.get(Base_URL + 'api/order/137', {
-            headers: {
-                accept: 'application/json',
-                authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
-            },
-        })
-        response = http.get(Base_URL + 'assets/icons/city/all_province.svg')
-        response = http.get(Base_URL + 'assets/icons/city/province_1.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_2.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_3.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_4.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_5.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_6.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_7.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_8.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_9.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_10.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_11.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_12.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_13.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_14.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_15.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_16.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_17.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_18.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_19.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_20.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_21.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_22.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_23.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_24.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_25.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_26.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_27.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_28.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_29.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_30.svg?v=1')
-        response = http.get(Base_URL + 'assets/icons/city/province_31.svg?v=1')
-
         sleep(1)
     })
 }

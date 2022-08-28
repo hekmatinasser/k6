@@ -5,17 +5,6 @@ import {
 import http from 'k6/http'
 
 export const options = {
-    ext: {
-        loadimpact: {
-            distribution: {
-                'amazon:us:ashburn': {
-                    loadZone: 'amazon:us:ashburn',
-                    percent: 100
-                }
-            },
-            apm: [],
-        },
-    },
     thresholds: {},
     scenarios: {
         Scenario_1: {
@@ -23,18 +12,18 @@ export const options = {
             gracefulStop: '30s',
             stages: [{
                     target: 20,
-                    duration: '1m'
+                    duration: '10s'
                 },
-                {
-                    target: 20,
-                    duration: '3m30s'
-                },
-                {
-                    target: 0,
-                    duration: '1m'
-                },
+                // {
+                //     target: 20,
+                //     duration: '3m30s'
+                // },
+                // {
+                //     target: 0,
+                //     duration: '1m'
+                // },
             ],
-            gracefulRampDown: '30s',
+            // gracefulRampDown: '30s',
             exec: 'scenario_1',
         },
     },

@@ -7,8 +7,8 @@ import {
 import http from 'k6/http'
 
 export const options = {
-    vus: 10,
-    duration: '5m'
+    vus: 100,
+    duration: '10s'
 }
 const Base_URL = "http://192.168.99.207:8020/"
 const Base_URL_Panel = "http://192.168.99.207:8020/"

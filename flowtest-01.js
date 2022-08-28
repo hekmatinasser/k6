@@ -9,9 +9,9 @@ export const options = {
     scenarios: {
         Scenario_1: {
             executor: 'ramping-vus',
-            gracefulStop: '30s',
+            gracefulStop: '10s',
             stages: [{
-                    target: 20,
+                    target: 100,
                     duration: '10s'
                 },
                 // {

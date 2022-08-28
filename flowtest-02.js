@@ -1,5 +1,3 @@
-// Creator: k6 Browser Recorder 0.6.2
-
 import {
     sleep,
     group
@@ -7,24 +5,39 @@ import {
 import http from 'k6/http'
 
 export const options = {
-    vus: 100,
-    duration: '10s'
+    thresholds: {},
+    scenarios: {
+        Scenario_1: {
+            executor: 'ramping-vus',
+            gracefulStop: '10s',
+            stages: [{
+                    target: 100,
+                    duration: '30s'
+                },
+                // {
+                //     target: 20,
+                //     duration: '3m30s'
+                // },
+                // {
+                //     target: 0,
+                //     duration: '1m'
+                // },
+            ],
+            // gracefulRampDown: '5s',
+            exec: 'Scenario_1',
+        },
+    },
 }
 const Base_URL = "http://192.168.99.207:8020/"
-const Base_URL_Panel = "http://192.168.99.207:8020/"
-export default function main() {
+const Base_URL_Panel = "http://panel.irantic.test/" // static assets from storage
+
+export function Scenario_1() {
     let response
 
     group('Home - ' + Base_URL, function () {
         response = http.get(
             Base_URL_Panel + 'storage/dynamic/slider/Cicw83LScuZWGtIxjGz7MF6ElmP2YctP4PVWJTdI.jpg'
         )
-
-        response = http.get(Base_URL + '', {
-            headers: {
-                'upgrade-insecure-requests': '1',
-            },
-        })
         response = http.get(Base_URL + 'assets/style/grids.css')
         response = http.get(Base_URL + 'assets/vue.js')
         response = http.get(Base_URL + 'assets/style/default.css?v=1811')
@@ -114,6 +127,8 @@ export default function main() {
             Base_URL_Panel + 'storage/show/show_image/KWLkUHXr07GK4aJ93WxyEYPYEhlu8sBf1qZscIZA.jpg'
         )
         response = http.get(Base_URL + 'assets/favicon/favicon-32x32.png')
+
+        sleep(1)
     })
 
     group(
@@ -214,6 +229,8 @@ export default function main() {
                 }
             )
             response = http.get(Base_URL + 'assets/icons/toman_regular_gray.svg')
+
+            sleep(1)
         }
     )
 
@@ -418,5 +435,7 @@ export default function main() {
         response = http.get(Base_URL + 'assets/icons/city/province_29.svg?v=1')
         response = http.get(Base_URL + 'assets/icons/city/province_30.svg?v=1')
         response = http.get(Base_URL + 'assets/icons/city/province_31.svg?v=1')
+
+        sleep(1)
     })
 }

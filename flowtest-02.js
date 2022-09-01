@@ -1,18 +1,20 @@
+// import { Checkbox } from 'element-ui'
 import {
     sleep,
     group
 } from 'k6'
 import http from 'k6/http'
+import randomIntBetween from "./utils/k6-utils.js";
 
 export const options = {
     thresholds: {},
     scenarios: {
         Scenario_1: {
             executor: 'ramping-vus',
-            gracefulStop: '10s',
+            gracefulStop: '1s',
             stages: [{
-                    target: 1000,
-                    duration: '1m'
+                    target: 5,
+                    duration: '20s'
                 },
                 // {
                 //     target: 20,
@@ -28,16 +30,26 @@ export const options = {
         },
     },
 }
-const Base_URL = "http://192.168.99.207:8020/"
-const Base_URL_Panel = "http://panel.irantic.test/" // static assets from storage
+const Base_URL = "http://prod.irantic.com/"
+// const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
+const token = "";
+const show = "concert/45057";
+const dates = [
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07"
+];
+let date = dates[(Math.random() * dates.length) | 0]
+const schedules = [955952, 955955, 955958, 955960, 955963, 955966];
+let schedule = schedules[(Math.random() * schedules.length) | 0]
+let seats = [];
 
 export function Scenario_1() {
     let response
 
     group('Home - ' + Base_URL, function () {
-        response = http.get(
-            Base_URL_Panel + 'storage/dynamic/slider/Cicw83LScuZWGtIxjGz7MF6ElmP2YctP4PVWJTdI.jpg'
-        )
+        // response = http.get(
+        //     Base_URL_Static + 'storage/dynamic/slider/Cicw83LScuZWGtIxjGz7MF6ElmP2YctP4PVWJTdI.jpg'
+        // )
         response = http.get(Base_URL + 'assets/style/grids.css')
         response = http.get(Base_URL + 'assets/vue.js')
         response = http.get(Base_URL + 'assets/style/default.css?v=1811')
@@ -114,97 +126,95 @@ export function Scenario_1() {
         response = http.get(Base_URL + 'assets/icons/city/province_29.svg?v=1')
         response = http.get(Base_URL + 'assets/icons/city/province_30.svg?v=1')
         response = http.get(Base_URL + 'assets/icons/city/province_31.svg?v=1')
-        response = http.get(
-            Base_URL_Panel + 'storage/dynamic/slider/dkDGl9HxmkIsLvXQ0H9YgTNw153dfEbZNG4a9WGu.jpg'
-        )
-        response = http.get(
-            Base_URL_Panel + 'storage/show/show_image/Ql9BlwGFCv0lO7sYrdkQROpB4R5d3IlwTSbFaGnp.jpg'
-        )
-        response = http.get(
-            Base_URL_Panel + 'storage/show/show_image/RFMWJ0xwbTBISpPknNvRYUSZ6VMXmw0zuDuW5omz.jpg'
-        )
-        response = http.get(
-            Base_URL_Panel + 'storage/show/show_image/KWLkUHXr07GK4aJ93WxyEYPYEhlu8sBf1qZscIZA.jpg'
-        )
+        // response = http.get(
+        //     Base_URL_Static + 'storage/dynamic/slider/dkDGl9HxmkIsLvXQ0H9YgTNw153dfEbZNG4a9WGu.jpg'
+        // )
+        // response = http.get(
+        //     Base_URL_Static + 'storage/show/show_image/Ql9BlwGFCv0lO7sYrdkQROpB4R5d3IlwTSbFaGnp.jpg'
+        // )
+        // response = http.get(
+        //     Base_URL_Static + 'storage/show/show_image/RFMWJ0xwbTBISpPknNvRYUSZ6VMXmw0zuDuW5omz.jpg'
+        // )
+        // response = http.get(
+        //     Base_URL_Static + 'storage/show/show_image/KWLkUHXr07GK4aJ93WxyEYPYEhlu8sBf1qZscIZA.jpg'
+        // )
         response = http.get(Base_URL + 'assets/favicon/favicon-32x32.png')
 
         sleep(1)
     })
 
-    group(
-        'Show',
+    group('Show',
         function () {
+            response = http.get(Base_URL + show)
+            sleep(1)
+            // response = http.get(
+            //     Base_URL_Static + 'storage/show/banner/m3Wssl7mNLURxFFNBhvT2IOye6ioTyJpDqrdhPZP.jpg'
+            // )
+            // response = http.get(
+            //     Base_URL_Static + 'storage/place/place_image/kGX4TdGDQIR46aDfOb5STgrQd85met4NFX5ynz7Y.jpeg'
+            // )
             response = http.get(
-                Base_URL + 'theater/45001/%D9%87%DB%8C%DA%86%DA%A9%D8%B3-%DA%A9%D8%A7%D8%B1%DB%8C%D8%B4-%D9%86%D8%AF%D8%A7%D8%B4%D8%AA%D9%87-%D8%A8%D8%A7%D8%B4%D9%87', {
-                    headers: {
-                        'upgrade-insecure-requests': '1',
-                    },
-                }
-            )
-
-            response = http.get(
-                Base_URL_Panel + 'storage/show/banner/m3Wssl7mNLURxFFNBhvT2IOye6ioTyJpDqrdhPZP.jpg'
-            )
-            response = http.get(
-                Base_URL_Panel + 'storage/place/place_image/kGX4TdGDQIR46aDfOb5STgrQd85met4NFX5ynz7Y.jpeg'
-            )
-            response = http.get(
-                Base_URL + 'api/schedule/dates?show_id=45001&place_id=1551&date=2022-09-13', {
+                Base_URL + date, {
                     headers: {
                         accept: 'application/json',
-                        authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
+                        authorization: 'Bearer ' + token,
                     },
                 }
             )
-            response = http.get(Base_URL + 'assets/icons/toman_regular_gray.svg')
-
-            sleep(1)
+            sleep(0.3)
         }
     )
 
     group('Schedule', function () {
-        response = http.get(Base_URL + 'schedule/32', {
-            headers: {
-                'upgrade-insecure-requests': '1',
-            },
-        })
+        response = http.get(Base_URL + 'schedule/' + schedule)
+        sleep(1)
         response = http.get(Base_URL + 'api/user/wallet', {
             headers: {
                 accept: 'application/json',
-                authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
+                authorization: 'Bearer ' + token,
             },
         })
-
-
         response = http.get(
-            Base_URL + 'api/schedule/dates?show_id=45001&place_id=1551&date=2022-09-13', {
+            Base_URL + date, {
                 headers: {
                     accept: 'application/json',
-                    authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
+                    authorization: 'Bearer ' + token,
                 },
             }
         )
+        seats = http.get(Base_URL + 'api/schedule/' + schedule + '/seats-status')
+        seats = seats.json().data;
+        // check()
 
-        response = http.get(Base_URL + 'api/schedule/32/seats-status', {
-            headers: {
-                accept: 'application/json',
-                authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
-            },
-        })
+        sleep(1)
+    })
 
-
+    group('Reserve', function () {
+        let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
+        let keys = Object.keys(freeSeats)
+        let randSeats = []
+        for (let i = 0; i < 3; i++) {
+            let randIndex = Math.floor(Math.random() * keys.length)
+            let randKey = keys[randIndex]
+            randSeats.push(freeSeats[randKey])
+        }
         response = http.post(
             Base_URL + 'api/order/reserve',
-            '{"seat_ids":[354167],"schedule_id":"32","block_ids":{"448647":0,"448648":0},"use_wallet":0,"gateway":"ir_igp"}', {
+            `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"1323":0,"1324":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
                 headers: {
                     accept: 'application/json',
-                    authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjE2MTY3MzcsImV4cCI6MTY5MzE1MjczOCwiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.fml7RhQTCMAIgjpOE2rdB86OKM7r28TqS1aPCULRvM8',
+                    authorization: 'Bearer ' + token,
                     'content-type': 'application/json; charset=UTF-8',
                 },
             }
         )
         sleep(1)
     })
+
+    // group('Confirm', function () {
+
+    //     sleep(1)
+    // })
 
     group('Ticket', function () {
         response = http.get(Base_URL + 'order/137', {

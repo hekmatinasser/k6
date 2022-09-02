@@ -1,7 +1,8 @@
 // import { Checkbox } from 'element-ui'
 import {
     sleep,
-    group
+    group,
+    check
 } from 'k6'
 import http from 'k6/http'
 import randomIntBetween from "./utils/k6-utils.js";
@@ -30,18 +31,27 @@ export const options = {
         },
     },
 }
-const Base_URL = "http://prod.irantic.com/"
+// const Base_URL = "http://prod.irantic.com/"
+const Base_URL = "http://192.168.99.207:8020/"
 // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
-const token = "";
-const show = "concert/45057";
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjIxMjU1MjIsImV4cCI6MTY5MzY2MTUyMywiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.S9cm1jZHBKOPVg3zUiopHKbjZl2kwIyGGmSwzqx7G3E";
+const customer_id = 3
+// const show = "concert/45057";
+const show = "concert/45003";
+// const dates = [
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07"
+// ];
 const dates = [
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07"
+    "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
+    "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
 ];
 let date = dates[(Math.random() * dates.length) | 0]
-const schedules = [955952, 955955, 955958, 955960, 955963, 955966];
+// const schedules = [955952, 955955, 955958, 955960, 955963, 955966];
+const schedules = [70, 71, 72, 73, 74, 75];
 let schedule = schedules[(Math.random() * schedules.length) | 0]
 let seats = [];
+const blocks = [1323, 1324]
 
 export function Scenario_1() {
     let response
@@ -188,7 +198,7 @@ export function Scenario_1() {
 
         sleep(1)
     })
-
+    let order_id;
     group('Reserve', function () {
         let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
@@ -200,7 +210,7 @@ export function Scenario_1() {
         }
         response = http.post(
             Base_URL + 'api/order/reserve',
-            `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"1323":0,"1324":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
+            `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"${blocks[0]}":0,"${blocks[1]}":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
                 headers: {
                     accept: 'application/json',
                     authorization: 'Bearer ' + token,
@@ -208,6 +218,15 @@ export function Scenario_1() {
                 },
             }
         )
+        check(response, {
+            'is status 200': (r) => r.status === 200,
+        });
+        response = response.json()
+        // check(response.success === true)
+        // check(response.code === 20002)
+        order_id = response.data.order_id
+        let code = response.data.code
+        // check(code > 0);
         sleep(1)
     })
 
@@ -217,11 +236,16 @@ export function Scenario_1() {
     // })
 
     group('Ticket', function () {
-        response = http.get(Base_URL + 'order/137', {
-            headers: {
-                'upgrade-insecure-requests': '1',
-            },
-        })
+        // response = http.get(Base_URL + `order/${order_id}`)
+        // response = response.json()
+        // check(response.data.code > 0)
+        sleep(1)
+    })
+
+    group('PDF', function () {
+        // response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
+        // check(response.status === 200)
+        // check('Response content size is > 100KB')
         sleep(1)
     })
 }

@@ -57,6 +57,12 @@ export function Scenario_1() {
     let response
 
     group('Home - ' + Base_URL, function () {
+        response = http.get(Base_URL)
+        check(response, {
+            'status is 200': (r) => r.status === 200,
+            'Homepage has expected test': (r) =>
+                r.body.includes('کنسرت قربانی'),
+        });
         // response = http.get(
         //     Base_URL_Static + 'storage/dynamic/slider/Cicw83LScuZWGtIxjGz7MF6ElmP2YctP4PVWJTdI.jpg'
         // )
@@ -156,6 +162,9 @@ export function Scenario_1() {
     group('Show',
         function () {
             response = http.get(Base_URL + show)
+            check(response, {
+                'Show status is 200': (r) => r.status === 200,
+            });
             sleep(1)
             // response = http.get(
             //     Base_URL_Static + 'storage/show/banner/m3Wssl7mNLURxFFNBhvT2IOye6ioTyJpDqrdhPZP.jpg'
@@ -171,19 +180,30 @@ export function Scenario_1() {
                     },
                 }
             )
+            check(response, {
+                'Date status is 200': (r) => r.status === 200,
+            });
             sleep(0.3)
         }
     )
 
     group('Schedule', function () {
         response = http.get(Base_URL + 'schedule/' + schedule)
+        check(response, {
+            'Schedule status is 200': (r) => r.status === 200,
+        });
         sleep(1)
+
         response = http.get(Base_URL + 'api/user/wallet', {
             headers: {
                 accept: 'application/json',
                 authorization: 'Bearer ' + token,
             },
         })
+        check(response, {
+            'Wallet status is 200': (r) => r.status === 200,
+        });
+
         response = http.get(
             Base_URL + date, {
                 headers: {
@@ -192,13 +212,20 @@ export function Scenario_1() {
                 },
             }
         )
-        seats = http.get(Base_URL + 'api/schedule/' + schedule + '/seats-status')
-        seats = seats.json().data;
-        // check()
+        check(response, {
+            'Date status is 200': (r) => r.status === 200,
+        });
 
+        seats = http.get(Base_URL + 'api/schedule/' + schedule + '/seats-status')
+        check(response, {
+            'seats-status is 200': (r) => r.status === 200,
+            'seats-status success is true': (s) => s.json().success === true,
+        });
+        seats = seats.json().data;
         sleep(1)
     })
-    let order_id;
+
+    let order_id = null;
     group('Reserve', function () {
         let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
@@ -219,33 +246,39 @@ export function Scenario_1() {
             }
         )
         check(response, {
-            'is status 200': (r) => r.status === 200,
+            'order/reserve status is 200': (r) => r.status === 200,
         });
+
         response = response.json()
-        // check(response.success === true)
-        // check(response.code === 20002)
-        order_id = response.data.order_id
-        let code = response.data.code
-        // check(code > 0);
+        check(response, {
+            'reserve has been succeed': (r) => r.success === true
+        });
+        if (response.success) {
+            check(response, {
+                'order_id is not NULL': (r) => r.data.order_id > 0,
+                'order_code is not NULL': (r) => r.data.code > 0,
+            });
+            order_id = response.data.order_id
+        }
         sleep(1)
     })
 
-    // group('Confirm', function () {
+    if (order_id) {
+        group('Ticket', function () {
+            response = http.get(Base_URL + `order/${order_id}`)
+            check(response, {
+                'status is 200': (r) => r.status === 200,
+                'code exist': (r) => r.body.data.code > 0,
+            });
+            sleep(1)
+        })
 
-    //     sleep(1)
-    // })
-
-    group('Ticket', function () {
-        // response = http.get(Base_URL + `order/${order_id}`)
-        // response = response.json()
-        // check(response.data.code > 0)
-        sleep(1)
-    })
-
-    group('PDF', function () {
-        // response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
-        // check(response.status === 200)
-        // check('Response content size is > 100KB')
-        sleep(1)
-    })
+        group('PDF', function () {
+            response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
+            check(response, {
+                'status is 200': (r) => r.status === 200,
+                'body size is larger than 50KB': (r) => r.body.length == 50000,
+            });
+        })
+    }
 }

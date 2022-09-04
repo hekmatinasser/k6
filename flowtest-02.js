@@ -8,7 +8,16 @@ import http from 'k6/http'
 import randomIntBetween from "./utils/k6-utils.js";
 
 export const options = {
-    thresholds: {},
+    thresholds: {
+        http_req_failed: ['rate<0.01'], // http errors should be less than 1%
+        http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+        'group_duration{group:::Home}': ['avg < 2000'],
+        'group_duration{group:::Show}': ['avg < 2000'],
+        'group_duration{group:::Schedule}': ['avg < 3000'],
+        'group_duration{group:::Reserve}': ['avg < 2500'],
+        'group_duration{group:::Ticket}': ['avg < 2000'],
+        'group_duration{group:::PDF}': ['avg < 2000'],
+    },
     scenarios: {
         Scenario_1: {
             executor: 'ramping-vus',
@@ -18,15 +27,15 @@ export const options = {
                     duration: '10s'
                 },
                 // {
-                //     target: 20,
-                //     duration: '3m30s'
+                //     target: 100,
+                //     duration: '5m'
                 // },
                 // {
-                //     target: 0,
-                //     duration: '1m'
+                //     target: 1000,
+                //     duration: '10m'
                 // },
             ],
-            // gracefulRampDown: '5s',
+            gracefulRampDown: '5s',
             exec: 'Scenario_1',
         },
     },
@@ -63,7 +72,7 @@ const blocks = [1323, 1324]
 export function Scenario_1() {
     let response
 
-    group('Home - ' + Base_URL, function () {
+    group('Home', function () {
         response = http.get(Base_URL)
         check(response, {
             'status is 200': (r) => r.status === 200,
@@ -255,7 +264,7 @@ export function Scenario_1() {
         )
         check(response, {
             'order/reserve status is 200': (r) => r.status === 200,
-        });        
+        });
 
         response = response.json()
         check(response, {

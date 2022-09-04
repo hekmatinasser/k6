@@ -11,12 +11,12 @@ export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
-        'group_duration{group:::Home}': ['avg < 2000'],
-        'group_duration{group:::Show}': ['avg < 2000'],
-        'group_duration{group:::Schedule}': ['avg < 3000'],
-        'group_duration{group:::Reserve}': ['avg < 2500'],
-        'group_duration{group:::Ticket}': ['avg < 2000'],
-        'group_duration{group:::PDF}': ['avg < 2000'],
+        'group_duration{group:::Home}': ['avg < 5000'],
+        'group_duration{group:::Show}': ['avg < 5000'],
+        'group_duration{group:::Schedule}': ['avg < 5000'],
+        'group_duration{group:::Reserve}': ['avg < 5000'],
+        'group_duration{group:::Ticket}': ['avg < 5000'],
+        'group_duration{group:::PDF}': ['avg < 5000'],
     },
     scenarios: {
         Scenario_1: {
@@ -24,7 +24,7 @@ export const options = {
             gracefulStop: '1s',
             stages: [{
                     target: 1,
-                    duration: '10s'
+                    duration: '30s'
                 },
                 // {
                 //     target: 100,
@@ -41,28 +41,28 @@ export const options = {
     },
 }
 
-// const Base_URL = "http://prod.irantic.com/"
-// const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjYxOTQ5NzAwLCJleHAiOjE2OTM0ODU3MDEsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.IktS9lGqWfGj3fPiH-IC5oxHTH23iBbbku6kLBBxQiQ";
-// const customer_id = 412
-// const show = "concert/45057";
-// const dates = [
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07",
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-08",
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
-// ];
-// const schedules = [955952, 955955, 955958, 955960, 955963, 955966, 955969, 955970];
-
-const Base_URL = "http://192.168.99.207:8020/"
-// const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjIxMjU1MjIsImV4cCI6MTY5MzY2MTUyMywiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.S9cm1jZHBKOPVg3zUiopHKbjZl2kwIyGGmSwzqx7G3E";
-const customer_id = 3
-const show = "concert/45003";
+const Base_URL = "http://prod.irantic.com/"
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjYxOTQ5NzAwLCJleHAiOjE2OTM0ODU3MDEsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.IktS9lGqWfGj3fPiH-IC5oxHTH23iBbbku6kLBBxQiQ";
+const customer_id = 412
+const show = "concert/45057";
 const dates = [
-    "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
-    "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-08",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
 ];
-const schedules = [70, 71, 72, 73, 74, 75];
+const schedules = [955952, 955955, 955958, 955960, 955963, 955966, 955969, 955970];
+
+// const Base_URL = "http://192.168.99.207:8020/"
+// // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
+// const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjIxMjU1MjIsImV4cCI6MTY5MzY2MTUyMywiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.S9cm1jZHBKOPVg3zUiopHKbjZl2kwIyGGmSwzqx7G3E";
+// const customer_id = 3
+// const show = "concert/45003";
+// const dates = [
+//     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
+//     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
+// ];
+// const schedules = [70, 71, 72, 73, 74, 75];
 
 let date = dates[(Math.random() * dates.length) | 0]
 let schedule = schedules[(Math.random() * schedules.length) | 0]
@@ -246,7 +246,7 @@ export function Scenario_1() {
         let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
         let randSeats = []
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < Math.random() * 11; i++) {
             let randIndex = Math.floor(Math.random() * keys.length)
             let randKey = keys[randIndex]
             randSeats.push(freeSeats[randKey][0])

@@ -14,8 +14,8 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1s',
             stages: [{
-                    target: 5,
-                    duration: '20s'
+                    target: 1,
+                    duration: '10s'
                 },
                 // {
                 //     target: 20,
@@ -31,24 +31,31 @@ export const options = {
         },
     },
 }
+
 // const Base_URL = "http://prod.irantic.com/"
+// const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjYxOTQ5NzAwLCJleHAiOjE2OTM0ODU3MDEsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.IktS9lGqWfGj3fPiH-IC5oxHTH23iBbbku6kLBBxQiQ";
+// const customer_id = 412
+// const show = "concert/45057";
+// const dates = [
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07",
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-08",
+//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
+// ];
+// const schedules = [955952, 955955, 955958, 955960, 955963, 955966, 955969, 955970];
+
 const Base_URL = "http://192.168.99.207:8020/"
 // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
 const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjIxMjU1MjIsImV4cCI6MTY5MzY2MTUyMywiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.S9cm1jZHBKOPVg3zUiopHKbjZl2kwIyGGmSwzqx7G3E";
 const customer_id = 3
-// const show = "concert/45057";
 const show = "concert/45003";
-// const dates = [
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
-//     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07"
-// ];
 const dates = [
     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
 ];
-let date = dates[(Math.random() * dates.length) | 0]
-// const schedules = [955952, 955955, 955958, 955960, 955963, 955966];
 const schedules = [70, 71, 72, 73, 74, 75];
+
+let date = dates[(Math.random() * dates.length) | 0]
 let schedule = schedules[(Math.random() * schedules.length) | 0]
 let seats = [];
 const blocks = [1323, 1324]
@@ -233,8 +240,9 @@ export function Scenario_1() {
         for (let i = 0; i < 3; i++) {
             let randIndex = Math.floor(Math.random() * keys.length)
             let randKey = keys[randIndex]
-            randSeats.push(freeSeats[randKey])
+            randSeats.push(freeSeats[randKey][0])
         }
+
         response = http.post(
             Base_URL + 'api/order/reserve',
             `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"${blocks[0]}":0,"${blocks[1]}":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
@@ -247,7 +255,7 @@ export function Scenario_1() {
         )
         check(response, {
             'order/reserve status is 200': (r) => r.status === 200,
-        });
+        });        
 
         response = response.json()
         check(response, {
@@ -265,10 +273,16 @@ export function Scenario_1() {
 
     if (order_id) {
         group('Ticket', function () {
-            response = http.get(Base_URL + `order/${order_id}`)
+            response = http.get(Base_URL + `api/order/${order_id}`, {
+                headers: {
+                    accept: 'application/json',
+                    authorization: 'Bearer ' + token,
+                    'content-type': 'application/json; charset=UTF-8',
+                }
+            })
             check(response, {
                 'status is 200': (r) => r.status === 200,
-                'code exist': (r) => r.body.data.code > 0,
+                'code exist': (r) => r.json().data.code > 0,
             });
             sleep(1)
         })
@@ -277,7 +291,7 @@ export function Scenario_1() {
             response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
             check(response, {
                 'status is 200': (r) => r.status === 200,
-                'body size is larger than 50KB': (r) => r.body.length == 50000,
+                'body size is larger than 50KB': (r) => r.body.length > 100000,
             });
         })
     }

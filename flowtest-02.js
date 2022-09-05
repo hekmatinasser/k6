@@ -148,7 +148,7 @@ export function Scenario_1() {
         let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
         if (freeSeats.length) {
-            let maxSeats = freeSeats > 11 ? 11 : freeSeats
+            let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
             let randSeats = []
             for (let i = 0; i < Math.random() * maxSeats; i++) {
                 let randIndex = Math.floor(Math.random() * keys.length)
@@ -165,7 +165,7 @@ export function Scenario_1() {
                         'content-type': 'application/json; charset=UTF-8',
                     },
                 }
-            )
+            )            
             check(response, {
                 'order/reserve status is 200': (r) => r.status === 200,
             });

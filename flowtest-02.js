@@ -6,7 +6,9 @@ import {
 } from 'k6'
 import http from 'k6/http'
 import randomIntBetween from "./utils/k6-utils.js";
-import { getStaticResources } from './modules/static-resources.js';
+import {
+    getStaticResources
+} from './modules/static-resources.js';
 
 export const options = {
     thresholds: {
@@ -165,7 +167,7 @@ export function Scenario_1() {
                         'content-type': 'application/json; charset=UTF-8',
                     },
                 }
-            )            
+            )
             check(response, {
                 'order/reserve status is 200': (r) => r.status === 200,
             });

@@ -23,18 +23,9 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1s',
             stages: [{
-                    target: 10,
-                    duration: '30s'
-                },
-                {
-                    target: 100,
-                    duration: '5m'
-                },
-                {
-                    target: 1000,
-                    duration: '10m'
-                },
-            ],
+                target: 1,
+                duration: '5m'
+            }],
             gracefulRampDown: '5s',
             exec: 'Scenario_1',
         },
@@ -46,12 +37,12 @@ const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVs
 const customer_id = 412
 const show = "concert/45057";
 const dates = [
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-06",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-07",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-08",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-10",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-11",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-12",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-13",
 ];
-const schedules = [955952, 955955, 955958, 955960, 955963, 955966, 955969, 955970];
+// const schedules = [955973, 955955, 955958, 955960, 955963, 955966, 955969, 956072];
 
 // const Base_URL = "http://192.168.99.207:8020/"
 // // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
@@ -65,7 +56,9 @@ const schedules = [955952, 955955, 955958, 955960, 955963, 955966, 955969, 95597
 // const schedules = [70, 71, 72, 73, 74, 75];
 
 let date = dates[(Math.random() * dates.length) | 0]
-let schedule = schedules[(Math.random() * schedules.length) | 0]
+// let schedule = schedules[(Math.random() * schedules.length) | 0]
+let schedule = Math.floor(Math.random() * (956072 - 955973 + 1)) + 955973
+
 let seats = [];
 const blocks = [1323, 1324]
 
@@ -245,39 +238,42 @@ export function Scenario_1() {
     group('Reserve', function () {
         let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
-        let randSeats = []
-        for (let i = 0; i < Math.random() * 11; i++) {
-            let randIndex = Math.floor(Math.random() * keys.length)
-            let randKey = keys[randIndex]
-            randSeats.push(freeSeats[randKey][0])
-        }
-
-        response = http.post(
-            Base_URL + 'api/order/reserve',
-            `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"${blocks[0]}":0,"${blocks[1]}":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
-                headers: {
-                    accept: 'application/json',
-                    authorization: 'Bearer ' + token,
-                    'content-type': 'application/json; charset=UTF-8',
-                },
+        if (freeSeats.length) {
+            let maxSeats = freeSeats > 11 ? 11 : freeSeats
+            let randSeats = []
+            for (let i = 0; i < Math.random() * maxSeats; i++) {
+                let randIndex = Math.floor(Math.random() * keys.length)
+                let randKey = keys[randIndex]
+                randSeats.push(freeSeats[randKey][0])
             }
-        )
-        check(response, {
-            'order/reserve status is 200': (r) => r.status === 200,
-        });
 
-        response = response.json()
-        check(response, {
-            'reserve has been succeed': (r) => r.success === true
-        });
-        if (response.success) {
+            response = http.post(
+                Base_URL + 'api/order/reserve',
+                `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"${blocks[0]}":0,"${blocks[1]}":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
+                    headers: {
+                        accept: 'application/json',
+                        authorization: 'Bearer ' + token,
+                        'content-type': 'application/json; charset=UTF-8',
+                    },
+                }
+            )
             check(response, {
-                'order_id is not NULL': (r) => r.data.order_id > 0,
-                'order_code is not NULL': (r) => r.data.code > 0,
+                'order/reserve status is 200': (r) => r.status === 200,
             });
-            order_id = response.data.order_id
+
+            response = response.json()
+            check(response, {
+                'reserve has been succeed': (r) => r.success === true
+            });
+            if (response.success) {
+                check(response, {
+                    'order_id is not NULL': (r) => r.data.order_id > 0,
+                    'order_code is not NULL': (r) => r.data.code > 0,
+                });
+                order_id = response.data.order_id
+            }
+            sleep(1)
         }
-        sleep(1)
     })
 
     if (order_id) {

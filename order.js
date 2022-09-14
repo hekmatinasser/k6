@@ -16,10 +16,13 @@ export const options = {
         http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
         // 'group_duration{group:::Home}': ['avg < 5000'],
         // 'group_duration{group:::Show}': ['avg < 5000'],
-        'group_duration{group:::Schedule}': ['avg < 5000'],
-        'group_duration{group:::Reserve}': ['avg < 5000'],
-        'group_duration{group:::Ticket}': ['avg < 5000'],
-        'group_duration{group:::PDF}': ['avg < 5000'],
+        'group_duration{group:::Confirm}': ['avg < 300'],
+        'group_duration{group:::Reserve}': ['avg < 300'],
+        'group_duration{group:::ScheduleList}': ['avg < 300'],
+        'group_duration{group:::ScheduleSeat}': ['avg < 300'],
+        'group_duration{group:::ScheduleSeatStatus}': ['avg < 300'],
+        // 'group_duration{group:::Ticket}': ['avg < 5000'],
+        // 'group_duration{group:::PDF}': ['avg < 5000'],
     },
     scenarios: {
         // Scenario_1: {
@@ -45,21 +48,22 @@ export const options = {
         // },
         Scenario_3: {
             executor: 'ramping-vus',
-            gracefulStop: '2m',
+            gracefulStop: '1s',
             stages: [{
-                target: 3000,
-                duration: '2m'
+                target: 1,
+                duration: '1s'
             }],
-            gracefulRampDown: '5m',
-            exec: 'Scenario_Reserve',
+            // gracefulRampDown: '5m',
+            exec: 'Scenario_Order',
         },
     },
 }
 
-const Base_URL = "http://prod.irantic.com/"
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjYxOTQ5NzAwLCJleHAiOjE2OTM0ODU3MDEsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.IktS9lGqWfGj3fPiH-IC5oxHTH23iBbbku6kLBBxQiQ";
+const Base_URL = "http://prod-order.irantic.com/"
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpcmFudGljLmNvbSIsImlkIjoxLCJ0aXRsZSI6Itin24zYsdin2YbYqtuM2qkiLCJpcHMiOltdfQ.s5I3VwlD0z_ZOIgbAaeom_aRjWt0zQCZSUnM6DP2e6FxbKicS1jJDdpb0EZT6tVubElyuNanzfIcFnTwBr9Fkw";
 const customer_id = 412
 const show = "concert/45057";
+const show_id = 45057;
 const dates = [
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-10",
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-11",
@@ -67,10 +71,7 @@ const dates = [
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-13",
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
 ];
-const schedules = [955973, 955976, 955979, 955982, 955985, 955988, 955991, 955993,
-    955996, 955999, 956002, 956008, 956011, 956014, 956017, 956020, 956023, 956026, 956029, 956032,
-    956034, 956037, 956040, 956043, 956046, 956049, 956052, 956054, 956057, 956060, 956063, 956066, 956069, 956072
-];
+const schedules = [956145, 956148, 956151, 956154, 956157, 956160, 956163, 956121, 956124, 956127, 956130, 956133, 956136, 956139, 956142, 956097, 956100, 956103, 956106, 956109, 956112, 956115, 956118, 956073, 956076, 956079, 956082, 956085, 956088, 956091, 956094, 956166, 956169, 956172, 956175, 956178, 956181, 956184];
 
 // const Base_URL = "http://192.168.99.207:8020/"
 // // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
@@ -81,7 +82,7 @@ const schedules = [955973, 955976, 955979, 955982, 955985, 955988, 955991, 95599
 //     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
 //     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
 // ];
-// const schedules = [70, 71, 72, 73, 74, 75];
+// const schedules = [70, 71, 72, 73, 74, 75]Scenario_Reserve;
 
 let date = dates[(Math.random() * dates.length) | 0]
 let schedule = schedules[(Math.random() * schedules.length) | 0]
@@ -239,4 +240,100 @@ export function Scenario_Reserve() {
 }
 export function Scenario_Static() {
     getStaticResources(Base_URL);
+}
+export function Scenario_Order() {
+    group('ScheduleList', function () {
+        response = http.get(Base_URL + `schedule?show_id=${show_id}&seller_id=1`)
+        check(response, {
+            'ScheduleList status is 200': (r) => r.status === 200,
+        });
+    })
+
+    group('ScheduleSeat', function () {
+        seats = http.get(Base_URL + `schedule/${schedule}/seats&seller_id=1`)
+
+        check(seats, {
+            'ScheduleSeat status is 200': (s) => s.status === 200,
+        });
+    })
+
+    group('ScheduleSeatStatus', function () {
+        seats = http.get(Base_URL + `schedule/${schedule}/seats_status&seller_id=1`)
+        console.log(seats);
+        check(seats, {
+            'ScheduleSeatStatus is 200': (s) => s.status === 200,
+            // 'seats-status success is true': (s) => s.json().success === true,
+        });
+        seats = seats.json().data;
+    })
+
+    let order_id = null;
+    group('Reserve', function () {
+        let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
+        let keys = Object.keys(freeSeats)
+        if (freeSeats.length) {
+            let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
+            let randSeats = []
+            for (let i = 0; i < Math.random() * maxSeats; i++) {
+                let randIndex = Math.floor(Math.random() * keys.length)
+                let randKey = keys[randIndex]
+                randSeats.push(freeSeats[randKey][0])
+            }
+
+            response = http.post(
+                Base_URL + 'order/reserve',
+                `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1323"}`
+            )
+
+            if (response.json().success === false) {
+
+                response = http.post(
+                    Base_URL + 'order/reserve',
+                    `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1324"}`, {
+                        headers: {
+                            accept: 'application/json',
+                            authorization: 'Bearer ' + token,
+                            'content-type': 'application/json; charset=UTF-8',
+                        },
+                    }
+                )
+            }
+
+            check(response, {
+                'order/reserve status is 200': (r) => r.status === 200,
+            });
+
+            response = response.json()
+            check(response, {
+                'reserve has been succeed': (r) => r.success === true
+            });
+            if (response.success) {
+                check(response, {
+                    'order_id is not NULL': (r) => r.data.order_id > 0,
+                    'order_code is not NULL': (r) => r.data.code > 0,
+                });
+                order_id = response.data.order_id
+            }
+            sleep(1)
+        }
+    })
+    if (order_id) {
+        group('Confirm', function () {
+            response = http.post(
+                Base_URL + 'order/confirm',
+                `{"seller_id":"1","order_id":${order_id}}`, {
+                    headers: {
+                        accept: 'application/json',
+                        authorization: 'Bearer ' + token,
+                        'content-type': 'application/json; charset=UTF-8',
+                    },
+                }
+            )
+            check(seats, {
+                'seats-status is 200': (s) => s.status === 200,
+                // 'seats-status success is true': (s) => s.json().success === true,
+            });
+            seats = seats.json().data;
+        })
+    }
 }

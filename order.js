@@ -51,7 +51,7 @@ export const options = {
             gracefulStop: '1s',
             stages: [{
                 target: 1,
-                duration: '1s'
+                duration: '10s'
             }],
             // gracefulRampDown: '5m',
             exec: 'Scenario_Order',
@@ -250,16 +250,14 @@ export function Scenario_Order() {
     })
 
     group('ScheduleSeat', function () {
-        seats = http.get(Base_URL + `schedule/${schedule}/seats&seller_id=1`)
-
+        seats = http.get(Base_URL + `schedule/${schedule}/seats?seller_id=1`)
         check(seats, {
             'ScheduleSeat status is 200': (s) => s.status === 200,
         });
     })
 
     group('ScheduleSeatStatus', function () {
-        seats = http.get(Base_URL + `schedule/${schedule}/seats_status&seller_id=1`)
-        console.log(seats);
+        seats = http.get(Base_URL + `schedule/${schedule}/seats_status?seller_id=1`)
         check(seats, {
             'ScheduleSeatStatus is 200': (s) => s.status === 200,
             // 'seats-status success is true': (s) => s.json().success === true,
@@ -333,7 +331,6 @@ export function Scenario_Order() {
                 'seats-status is 200': (s) => s.status === 200,
                 // 'seats-status success is true': (s) => s.json().success === true,
             });
-            seats = seats.json().data;
         })
     }
 }

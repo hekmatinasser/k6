@@ -14,43 +14,44 @@ export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
-        // 'group_duration{group:::Home}': ['avg < 5000'],
-        // 'group_duration{group:::Show}': ['avg < 5000'],
+        http_req_waiting: ['p(95)<5000'],
+        'group_duration{group:::Home}': ['avg < 5000'],
+        'group_duration{group:::Show}': ['avg < 5000'],
         'group_duration{group:::Schedule}': ['avg < 5000'],
         'group_duration{group:::Reserve}': ['avg < 5000'],
         'group_duration{group:::Ticket}': ['avg < 5000'],
         'group_duration{group:::PDF}': ['avg < 5000'],
     },
     scenarios: {
-        // Scenario_1: {
+        // Scenario_Home: {
         //     executor: 'ramping-vus',
-        //     gracefulStop: '1m',
+        //     gracefulStop: '10s',
         //     stages: [{
-        //         target: 5000,
-        //         duration: '5m'
+        //         target: 1,
+        //         duration: '10s'
         //     }],
         //     // gracefulRampDown: '5m',
         //     exec: 'Scenario_Home',
         // },
-        // Scenario_2: {
+        // Scenario_Schedule: {
         //     executor: 'ramping-vus',
-        //     gracefulStop: '2m',
+        //     gracefulStop: '1s',
         //     stages: [{
-        //         target: 3000,
-        //         duration: '2m'
+        //         target: 1,
+        //         duration: '10s'
 
         //     }],
-        //     gracefulRampDown: '5m',
+        //     gracefulRampDown: '1s',
         //     exec: 'Scenario_Schedule',
         // },
-        Scenario_3: {
+        Scenario_Reserve: {
             executor: 'ramping-vus',
-            gracefulStop: '2m',
+            gracefulStop: '1s',
             stages: [{
-                target: 3000,
-                duration: '2m'
+                target: 1,
+                duration: '10s'
             }],
-            gracefulRampDown: '5m',
+            gracefulRampDown: '1s',
             exec: 'Scenario_Reserve',
         },
     },
@@ -61,15 +62,12 @@ const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVs
 const customer_id = 412
 const show = "concert/45057";
 const dates = [
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-10",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-11",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-12",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-13",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-21",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-22",
+    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-23"
 ];
-const schedules = [955973, 955976, 955979, 955982, 955985, 955988, 955991, 955993,
-    955996, 955999, 956002, 956008, 956011, 956014, 956017, 956020, 956023, 956026, 956029, 956032,
-    956034, 956037, 956040, 956043, 956046, 956049, 956052, 956054, 956057, 956060, 956063, 956066, 956069, 956072
+const schedules = [956097, 956100, 956103, 956106, 956109, 956112, 956115, 956118, 956073,
+    956076, 956079, 956082, 956085, 956088, 956091, 956094, 956166, 956169, 956172, 956175, 956178, 956181, 956184
 ];
 
 // const Base_URL = "http://192.168.99.207:8020/"
@@ -96,11 +94,11 @@ export function Scenario_Home() {
         response = http.get(Base_URL)
         check(response, {
             'status is 200': (r) => r.status === 200,
-            // 'Homepage has expected test': (r) =>
-            //     r.body.includes('کنسرت قربانی'),
+            'Homepage has expected test': (r) =>
+                r.body.includes('کنسرت قربانی'),
         });
-        // getStaticResources();
-        // sleep(1)
+        getStaticResources(Base_URL);
+        sleep(1)
     })
 }
 export function Scenario_Schedule() {
@@ -110,13 +108,7 @@ export function Scenario_Schedule() {
             check(response, {
                 'Show status is 200': (r) => r.status === 200,
             });
-            sleep(1)
-            // response = http.get(
-            //     Base_URL_Static + 'storage/show/banner/m3Wssl7mNLURxFFNBhvT2IOye6ioTyJpDqrdhPZP.jpg'
-            // )
-            // response = http.get(
-            //     Base_URL_Static + 'storage/place/place_image/kGX4TdGDQIR46aDfOb5STgrQd85met4NFX5ynz7Y.jpeg'
-            // )
+            sleep(0.3)
             response = http.get(
                 Base_URL + date, {
                     headers: {
@@ -165,7 +157,7 @@ export function Scenario_Reserve() {
         seats = http.get(Base_URL + 'api/schedule/' + schedule + '/seats-status')
         check(seats, {
             'seats-status is 200': (s) => s.status === 200,
-            // 'seats-status success is true': (s) => s.json().success === true,
+            'seats-status success is true': (s) => s.json().success === true,
         });
         seats = seats.json().data;
         sleep(1)
@@ -236,7 +228,4 @@ export function Scenario_Reserve() {
             });
         })
     }
-}
-export function Scenario_Static() {
-    getStaticResources(Base_URL);
 }

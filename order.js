@@ -50,8 +50,8 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1s',
             stages: [{
-                target: 1,
-                duration: '10s'
+                target: 1000,
+                duration: '5m'
             }],
             // gracefulRampDown: '5m',
             exec: 'Scenario_Order',
@@ -265,72 +265,72 @@ export function Scenario_Order() {
         seats = seats.json().data;
     })
 
-    let order_id = null;
-    group('Reserve', function () {
-        let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
-        let keys = Object.keys(freeSeats)
-        if (freeSeats.length) {
-            let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
-            let randSeats = []
-            for (let i = 0; i < Math.random() * maxSeats; i++) {
-                let randIndex = Math.floor(Math.random() * keys.length)
-                let randKey = keys[randIndex]
-                randSeats.push(freeSeats[randKey][0])
-            }
+    // let order_id = null;
+    // group('Reserve', function () {
+    //     let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
+    //     let keys = Object.keys(freeSeats)
+    //     if (freeSeats.length) {
+    //         let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
+    //         let randSeats = []
+    //         for (let i = 0; i < Math.random() * maxSeats; i++) {
+    //             let randIndex = Math.floor(Math.random() * keys.length)
+    //             let randKey = keys[randIndex]
+    //             randSeats.push(freeSeats[randKey][0])
+    //         }
 
-            response = http.post(
-                Base_URL + 'order/reserve',
-                `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1323"}`
-            )
+    //         response = http.post(
+    //             Base_URL + 'order/reserve',
+    //             `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1323"}`
+    //         )
 
-            if (response.json().success === false) {
+    //         if (response.json().success === false) {
 
-                response = http.post(
-                    Base_URL + 'order/reserve',
-                    `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1324"}`, {
-                        headers: {
-                            accept: 'application/json',
-                            authorization: 'Bearer ' + token,
-                            'content-type': 'application/json; charset=UTF-8',
-                        },
-                    }
-                )
-            }
+    //             response = http.post(
+    //                 Base_URL + 'order/reserve',
+    //                 `{"seller_id":"1","seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_id":"1324"}`, {
+    //                     headers: {
+    //                         accept: 'application/json',
+    //                         authorization: 'Bearer ' + token,
+    //                         'content-type': 'application/json; charset=UTF-8',
+    //                     },
+    //                 }
+    //             )
+    //         }
 
-            check(response, {
-                'order/reserve status is 200': (r) => r.status === 200,
-            });
+    //         check(response, {
+    //             'order/reserve status is 200': (r) => r.status === 200,
+    //         });
 
-            response = response.json()
-            check(response, {
-                'reserve has been succeed': (r) => r.success === true
-            });
-            if (response.success) {
-                check(response, {
-                    'order_id is not NULL': (r) => r.data.order_id > 0,
-                    'order_code is not NULL': (r) => r.data.code > 0,
-                });
-                order_id = response.data.order_id
-            }
-            sleep(1)
-        }
-    })
-    if (order_id) {
-        group('Confirm', function () {
-            response = http.post(
-                Base_URL + 'order/confirm',
-                `{"seller_id":"1","order_id":${order_id}}`, {
-                    headers: {
-                        accept: 'application/json',
-                        authorization: 'Bearer ' + token,
-                        'content-type': 'application/json; charset=UTF-8',
-                    },
-                }
-            )
-            check(seats, {
-                'seats-status is 200': (s) => s.status === 200,
-                // 'seats-status success is true': (s) => s.json().success === true,
-            });
-        })
-    }
+    //         response = response.json()
+    //         check(response, {
+    //             'reserve has been succeed': (r) => r.success === true
+    //         });
+    //         if (response.success) {
+    //             check(response, {
+    //                 'order_id is not NULL': (r) => r.data.order_id > 0,
+    //                 'order_code is not NULL': (r) => r.data.code > 0,
+    //             });
+    //             order_id = response.data.order_id
+    //         }
+    //         sleep(1)
+    //     }
+    // })
+    // if (order_id) {
+    //     group('Confirm', function () {
+    //         response = http.post(
+    //             Base_URL + 'order/confirm',
+    //             `{"seller_id":"1","order_id":${order_id}}`, {
+    //                 headers: {
+    //                     accept: 'application/json',
+    //                     authorization: 'Bearer ' + token,
+    //                     'content-type': 'application/json; charset=UTF-8',
+    //                 },
+    //             }
+    //         )
+    //         check(seats, {
+    //             'seats-status is 200': (s) => s.status === 200,
+    //             // 'seats-status success is true': (s) => s.json().success === true,
+    //         });
+    //     })
+    // }
 }

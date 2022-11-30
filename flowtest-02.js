@@ -13,7 +13,7 @@ import {
 export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
-        http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+        http_req_duration: ['p(95)<1000'], // 95% of requests should be below 500ms
         http_req_waiting: ['p(95)<5000'],
         'group_duration{group:::Home}': ['avg < 5000'],
         'group_duration{group:::Show}': ['avg < 5000'],
@@ -23,35 +23,35 @@ export const options = {
         'group_duration{group:::PDF}': ['avg < 5000'],
     },
     scenarios: {
-        // Scenario_Home: {
-        //     executor: 'ramping-vus',
-        //     gracefulStop: '10s',
-        //     stages: [{
-        //         target: 1,
-        //         duration: '10s'
-        //     }],
-        //     // gracefulRampDown: '5m',
-        //     exec: 'Scenario_Home',
-        // },
-        // Scenario_Schedule: {
-        //     executor: 'ramping-vus',
-        //     gracefulStop: '1s',
-        //     stages: [{
-        //         target: 1,
-        //         duration: '10s'
+        Scenario_Home: {
+            executor: 'ramping-vus',
+            gracefulStop: '1m',
+            stages: [{
+                target: 10000,
+                duration: '5m'
+            }],
+            gracefulRampDown: '1m',
+            exec: 'Scenario_Home',
+        },
+        Scenario_Schedule: {
+            executor: 'ramping-vus',
+            gracefulStop: '1m',
+            stages: [{
+                target: 10000,
+                duration: '5m'
 
-        //     }],
-        //     gracefulRampDown: '1s',
-        //     exec: 'Scenario_Schedule',
-        // },
+            }],
+            gracefulRampDown: '2m',
+            exec: 'Scenario_Schedule',
+        },
         Scenario_Reserve: {
             executor: 'ramping-vus',
-            gracefulStop: '1s',
+            gracefulStop: '1m',
             stages: [{
-                target: 1,
-                duration: '10s'
+                target: 10000,
+                duration: '10m'
             }],
-            gracefulRampDown: '1s',
+            gracefulRampDown: '2m',
             exec: 'Scenario_Reserve',
         },
     },
@@ -224,7 +224,7 @@ export function Scenario_Reserve() {
             response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
             check(response, {
                 'status is 200': (r) => r.status === 200,
-                'body size is larger than 50KB': (r) => r.body.length > 100000,
+                'body size is larger than 5KB': (r) => r.body.length > 5000,
             });
         })
     }

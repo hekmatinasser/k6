@@ -27,7 +27,7 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1m',
             stages: [{
-                target: 10000,
+                target: 1000,
                 duration: '5m'
             }],
             gracefulRampDown: '1m',
@@ -37,7 +37,7 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1m',
             stages: [{
-                target: 10000,
+                target: 1000,
                 duration: '5m'
 
             }],
@@ -48,7 +48,7 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1m',
             stages: [{
-                target: 10000,
+                target: 1000,
                 duration: '10m'
             }],
             gracefulRampDown: '2m',
@@ -57,37 +57,22 @@ export const options = {
     },
 }
 
-const Base_URL = "http://prod.irantic.com/"
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjYxOTQ5NzAwLCJleHAiOjE2OTM0ODU3MDEsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.IktS9lGqWfGj3fPiH-IC5oxHTH23iBbbku6kLBBxQiQ";
+const Base_URL = "https://prod.irantic.com/"
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjY5NjQ0MDQ0LCJleHAiOjE3MDExODAwNDUsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.owffk0e5kVRQVjq9nRhDgxtX_J7s9_QKo5855fWqmoQ";
 const customer_id = 412
 const show = "concert/45057";
 const dates = [
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-21",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-22",
-    "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-23"
+    "api/schedule/dates?show_id=45125&place_id=1169&date=2022-12-03",
+    "api/schedule/dates?show_id=45125&place_id=1169&date=2022-12-04"
 ];
-const schedules = [956097, 956100, 956103, 956106, 956109, 956112, 956115, 956118, 956073,
-    956076, 956079, 956082, 956085, 956088, 956091, 956094, 956166, 956169, 956172, 956175, 956178, 956181, 956184
-];
-
-// const Base_URL = "http://192.168.99.207:8020/"
-// // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
-// const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJhdWQiOiJodHRwOlwvXC9pcmFudGljLnRlc3QiLCJuYmYiOjE2NjIxMjU1MjIsImV4cCI6MTY5MzY2MTUyMywiaWQiOjMsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.S9cm1jZHBKOPVg3zUiopHKbjZl2kwIyGGmSwzqx7G3E";
-// const customer_id = 3
-// const show = "concert/45003";
-// const dates = [
-//     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-11",
-//     "api/schedule/dates?show_id=45003&place_id=18&date=2022-09-12"
-// ];
-// const schedules = [70, 71, 72, 73, 74, 75];
+const schedules = [1102725, 1102728, 1102731, 1102734, 1102737, 1102740, 1102743, 1102746];
 
 let date = dates[(Math.random() * dates.length) | 0]
 let schedule = schedules[(Math.random() * schedules.length) | 0]
-// let schedule = Math.floor(Math.random() * (956072 - 955973 + 1)) + 955973
 
 let seats = [];
 let response
-const blocks = [1323, 1324]
+const blocks = [44436]
 
 export function Scenario_Home() {
     group('Home', function () {
@@ -95,7 +80,7 @@ export function Scenario_Home() {
         check(response, {
             'status is 200': (r) => r.status === 200,
             'Homepage has expected test': (r) =>
-                r.body.includes('کنسرت قربانی'),
+                r.body.includes('تست ایرانتیک'),
         });
         getStaticResources(Base_URL);
         sleep(1)
@@ -169,7 +154,7 @@ export function Scenario_Reserve() {
         if (freeSeats.length) {
             let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
             let randSeats = []
-            for (let i = 0; i < Math.random() * maxSeats; i++) {
+            for (let i = 1; i < Math.random() * maxSeats; i++) {
                 let randIndex = Math.floor(Math.random() * keys.length)
                 let randKey = keys[randIndex]
                 randSeats.push(freeSeats[randKey][0])

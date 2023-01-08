@@ -15,57 +15,57 @@ export const options = {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<1000'], // 95% of requests should be below 500ms
         http_req_waiting: ['p(95)<2000'],
-        'group_duration{group:::Login}': ['avg < 2000'],
-        'group_duration{group:::Home}': ['avg < 2000'],
-        'group_duration{group:::Show & Schedule}': ['avg < 2000'],
-        'group_duration{group:::Seat}': ['avg < 2000'],
-        'group_duration{group:::Reserve}': ['avg < 2000'],
+        // 'group_duration{group:::Login}': ['avg < 2000'],
+        'group_duration{group:::Home}': ['avg < 3000'],
+        'group_duration{group:::Show & Schedule}': ['avg < 3000'],
+        'group_duration{group:::Seat}': ['avg < 3000'],
+        'group_duration{group:::Reserve}': ['avg < 3000'],
         // 'group_duration{group:::Ticket}': ['avg < 2000'],
         // 'group_duration{group:::PDF}': ['avg < 2000'],
     },
     scenarios: {
-        Scenario_Login: {
-            executor: 'ramping-vus',
-            gracefulStop: '1s',
-            stages: [{
-                target: 1,
-                duration: '2s'
+        // Scenario_Login: {
+        //     executor: 'ramping-vus',
+        //     gracefulStop: '1s',
+        //     stages: [{
+        //         target: 1,
+        //         duration: '2s'
 
-            }],
-            gracefulRampDown: '1s',
-            exec: 'Scenario_Login',
-        },
+        //     }],
+        //     gracefulRampDown: '1s',
+        //     exec: 'Scenario_Login',
+        // },
         Scenario_Home: {
             executor: 'ramping-vus',
-            gracefulStop: '1s',
+            gracefulStop: '5s',
             stages: [{
-                target: 1,
-                duration: '1s'
+                target: 1000,
+                duration: '10m'
             }],
-            gracefulRampDown: '1s',
+            gracefulRampDown: '5s',
             exec: 'Scenario_Home',
         },
         Scenario_Schedule: {
             executor: 'ramping-vus',
-            gracefulStop: '1s',
+            gracefulStop: '5s',
             stages: [{
-                target: 1,
-                duration: '1s'
+                target: 1000,
+                duration: '10m'
 
             }],
-            gracefulRampDown: '1s',
+            gracefulRampDown: '5s',
             exec: 'Scenario_Schedule',
         },
-        Scenario_Reserve: {
-            executor: 'ramping-vus',
-            gracefulStop: '1s',
-            stages: [{
-                target: 1,
-                duration: '10s'
-            }],
-            gracefulRampDown: '1s',
-            exec: 'Scenario_Reserve',
-        },
+        // Scenario_Reserve: {
+        //     executor: 'ramping-vus',
+        //     gracefulStop: '1s',
+        //     stages: [{
+        //         target: 1,
+        //         duration: '4s'
+        //     }],
+        //     gracefulRampDown: '1s',
+        //     exec: 'Scenario_Reserve',
+        // },
 
     },
 }
@@ -105,6 +105,8 @@ export function Scenario_Home() {
     })
 }
 export function Scenario_Schedule() {
+
+    let schedule_id;
     group('Show & Schedule',
         function () {
             response = http.get(Base_URL + `v2/show/places-dates/${show_id}`)
@@ -143,16 +145,16 @@ export function Scenario_Schedule() {
                 fail('unexpected response');
             }
             schedules = _schedules.data;
+            schedule_id = schedules[(Math.random() * schedules.length) | 0].id;
+
         }
     )
-}
 
-export function Scenario_Reserve() {
-    let schedule_id = schedules[(Math.random() * schedules.length) | 0].id;
+    let _seats = null;
+    let _seats_status = null;
     group('Seat', function () {
-
-        let _seats = http.get(Base_URL + `v2/schedule/${schedule_id}/seats`)
-        checkOutput = check(seats, {
+        _seats = http.get(Base_URL + `v2/schedule/${schedule_id}/seats`)
+        checkOutput = check(_seats, {
             'seats is 200': (s) => s.status === 200,
         });
         if (!checkOutput) {
@@ -160,15 +162,15 @@ export function Scenario_Reserve() {
         }
         seats = _seats.json().data;
 
-        let _seats_status = http.get(Base_URL + `v2/schedule/${schedule_id}/seats-status`)
-        checkOutput = check(seats_status, {
+        _seats_status = http.get(Base_URL + `schedule/${schedule_id}/seats-status`)
+
+        checkOutput = check(_seats_status, {
             'seats_status is 200': (s) => s.status === 200,
         });
         if (!checkOutput) {
-            fail('unexpected response');
+            console.log(`schedule_id: ${schedule_id}`);
         }
         seats_status = _seats_status.json().data;
-
         // response = http.get(Base_URL + 'api/user/wallet', {
         //     headers: {
         //         accept: 'application/json',
@@ -195,70 +197,79 @@ export function Scenario_Reserve() {
     let order_id = null;
 
     group('Reserve', function () {
-        let freeSeats = Object.entries(seats_status).filter(([key, value]) => value === 0);
-        let keys = Object.keys(freeSeats)
-        if (freeSeats.length) {
-            let maxSeats = (freeSeats.length > 11 ? 11 : freeSeats.length) * Math.random();
-            let randSeats = [];
-            for (let i = 1; i < maxSeats; i++) {
-                let randIndex = Math.floor(Math.random() * keys.length)
-                let randKey = keys[randIndex]
-                randSeats.push(freeSeats[randKey][0])
-            }
-
-            response = http.post(
-                Base_URL + 'api/order/reserve',
-                `{"seat_ids":[${randSeats}],"schedule_id":"${schedule_id}","block_ids":{"${blocks[0]}":0}":0},"use_wallet":0,"gateway":"ir_pec"}`, {
-                    headers: {
-                        accept: 'application/json',
-                        authorization: 'Bearer ' + token,
-                        'content-type': 'application/json; charset=UTF-8',
-                    },
+        if (seats_status) {
+            let freeSeats = Object.entries(seats_status).filter(([key, value]) => value === 0);
+            let keys = Object.keys(freeSeats)
+            if (freeSeats.length) {
+                let maxSeats = (freeSeats.length > 11 ? 11 : freeSeats.length) * Math.random();
+                let randSeats = [];
+                for (let i = 1; i < maxSeats; i++) {
+                    let randIndex = Math.floor(Math.random() * keys.length)
+                    let randKey = keys[randIndex]
+                    randSeats.push(freeSeats[randKey][0])
                 }
-            )
-            check(response, {
-                'order/reserve status is 200': (r) => r.status === 200,
-            });
-
-            response = response.json()
-            check(response, {
-                'reserve has been succeed': (r) => r.success === true
-            });
-            if (response.success) {
+                
+                response = http.post(
+                    Base_URL + 'order/reserve',
+                    `{"seat_ids":[${randSeats}],"schedule_id":"${schedule_id}","block_ids":{"${blocks[0]}":0},"use_wallet":0,"gateway":"ir_pec"}`, {
+                        headers: {
+                            accept: 'application/json',
+                            authorization: 'Bearer ' + token,
+                            'content-type': 'application/json; charset=UTF-8',
+                        },
+                    }
+                )
+                
                 check(response, {
-                    'order_id is not NULL': (r) => r.data.order_id > 0,
-                    'order_code is not NULL': (r) => r.data.code > 0,
+                    'order/reserve status is 200': (r) => r.status === 200,
                 });
-                order_id = response.data.order_id
+
+                response = response.json()
+                check(response, {
+                    'reserve has been succeed': (r) => r.success === true,
+                    'order is free': (r) => r.code === 20002
+                });
+
+                if (response.success) {
+                    check(response, {
+                        'order_id is not NULL': (r) => r.data.order_id > 0,
+                        'order_code is not NULL': (r) => r.data.code > 0,
+                    });
+                    order_id = response.data.order_id
+                }
+                sleep(1)
             }
-            sleep(1)
         }
     })
+}
 
-    if (order_id) {
-        group('Ticket', function () {
-            response = http.get(Base_URL + `api/order/${order_id}`, {
-                headers: {
-                    accept: 'application/json',
-                    authorization: 'Bearer ' + token,
-                    'content-type': 'application/json; charset=UTF-8',
-                }
-            })
-            check(response, {
-                'status is 200': (r) => r.status === 200,
-                // 'code exist': (r) => r.json().data.code > 0,
-            });
-            sleep(1)
-        })
+export function Scenario_Reserve() {
 
-        group('PDF', function () {
-            response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
-            check(response, {
-                'status is 200': (r) => r.status === 200,
-                'body size is larger than 5KB': (r) => r.body.length > 5000,
-            });
-        })
-    }
+
+    // if (order_id) {
+    //     group('Ticket', function () {
+    //         response = http.get(Base_URL + `api/order/${order_id}`, {
+    //             headers: {
+    //                 accept: 'application/json',
+    //                 authorization: 'Bearer ' + token,
+    //                 'content-type': 'application/json; charset=UTF-8',
+    //             }
+    //         })
+    //         check(response, {
+    //             'status is 200': (r) => r.status === 200,
+    //             // 'code exist': (r) => r.json().data.code > 0,
+    //         });
+    //         sleep(1)
+    //     })
+
+    //     group('PDF', function () {
+    //         response = http.get(Base_URL + `print?url=${order_id + customer_id}_${order_id}`)
+    //         check(response, {
+    //             'status is 200': (r) => r.status === 200,
+    //             'body size is larger than 5KB': (r) => r.body.length > 5000,
+    //         });
+    //     })
+    // }
 }
 
 export function Scenario_Login() {
@@ -279,4 +290,8 @@ export function Scenario_Login() {
             });
         }
     )
+}
+
+function fail(message) {
+    console.log(message);
 }

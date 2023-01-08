@@ -14,147 +14,193 @@ export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<1000'], // 95% of requests should be below 500ms
-        http_req_waiting: ['p(95)<5000'],
-        'group_duration{group:::Home}': ['avg < 5000'],
-        'group_duration{group:::Show}': ['avg < 5000'],
-        'group_duration{group:::Schedule}': ['avg < 5000'],
-        'group_duration{group:::Reserve}': ['avg < 5000'],
-        'group_duration{group:::Ticket}': ['avg < 5000'],
-        'group_duration{group:::PDF}': ['avg < 5000'],
+        http_req_waiting: ['p(95)<2000'],
+        'group_duration{group:::Login}': ['avg < 2000'],
+        'group_duration{group:::Home}': ['avg < 2000'],
+        'group_duration{group:::Show & Schedule}': ['avg < 2000'],
+        'group_duration{group:::Seat}': ['avg < 2000'],
+        'group_duration{group:::Reserve}': ['avg < 2000'],
+        // 'group_duration{group:::Ticket}': ['avg < 2000'],
+        // 'group_duration{group:::PDF}': ['avg < 2000'],
     },
     scenarios: {
+        Scenario_Login: {
+            executor: 'ramping-vus',
+            gracefulStop: '1s',
+            stages: [{
+                target: 1,
+                duration: '2s'
+
+            }],
+            gracefulRampDown: '1s',
+            exec: 'Scenario_Login',
+        },
         Scenario_Home: {
             executor: 'ramping-vus',
-            gracefulStop: '1m',
+            gracefulStop: '1s',
             stages: [{
-                target: 1000,
-                duration: '5m'
+                target: 1,
+                duration: '1s'
             }],
-            gracefulRampDown: '1m',
+            gracefulRampDown: '1s',
             exec: 'Scenario_Home',
         },
         Scenario_Schedule: {
             executor: 'ramping-vus',
-            gracefulStop: '1m',
+            gracefulStop: '1s',
             stages: [{
-                target: 1000,
-                duration: '5m'
+                target: 1,
+                duration: '1s'
 
             }],
-            gracefulRampDown: '2m',
+            gracefulRampDown: '1s',
             exec: 'Scenario_Schedule',
         },
         Scenario_Reserve: {
             executor: 'ramping-vus',
-            gracefulStop: '1m',
+            gracefulStop: '1s',
             stages: [{
-                target: 1000,
-                duration: '10m'
+                target: 1,
+                duration: '10s'
             }],
-            gracefulRampDown: '2m',
+            gracefulRampDown: '1s',
             exec: 'Scenario_Reserve',
         },
+
     },
 }
 
-const Base_URL = "https://prod-api.iticket.ir/"
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjY5NjQ0MDQ0LCJleHAiOjE3MDExODAwNDUsImlkIjo0MTIsIm1vYmlsZSI6IjA5MTczODcyNDg0IiwibmFtZSI6Ilx1MDYyN1x1MDYyZFx1MDYzM1x1MDYyN1x1MDY0NiBcdTA2MzRcdTA2MjdcdTA2YTlcdTA2MzFcdTA2Y2MgXHUwNjdlXHUwNjQ4XHUwNjMxIiwicHJvdmluY2VfaWQiOjh9.owffk0e5kVRQVjq9nRhDgxtX_J7s9_QKo5855fWqmoQ";
-const customer_id = 412
-const show = "concert/45057";
-const dates = [
-    "api/schedule/dates?show_id=45125&place_id=1169&date=2022-12-03",
-    "api/schedule/dates?show_id=45125&place_id=1169&date=2022-12-04"
-];
-const schedules = [1102725, 1102728, 1102731, 1102734, 1102737, 1102740, 1102743, 1102746];
+const Base_URL = "https://prod-api.iticket.ir/api/"
+const show_id = 88;
+const mobile = '09173872484';
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOm51bGwsImF1ZCI6bnVsbCwibmJmIjoxNjczMTc1ODc0LCJleHAiOjE3MDQ3MTE4NzUsImlkIjo0LCJtb2JpbGUiOiIwOTE3Mzg3MjQ4NCIsIm5hbWUiOiJcdTA2MjdcdTA2MmRcdTA2MzNcdTA2MjdcdTA2NDYiLCJwcm92aW5jZV9pZCI6OH0.oLxaCNiPB15HYNMbe8weFxzQyNpkNxEmH4WZKph1kuA";
+// const customer_id = 4
 
-let date = dates[(Math.random() * dates.length) | 0]
-let schedule = schedules[(Math.random() * schedules.length) | 0]
+let dates;
+let date;
+let places;
+let place;
+let schedules;
+let seats;
+let seats_status;
 
-let seats = [];
-let response
-const blocks = [44436]
+let response;
+let checkOutput;
+const blocks = [3]
 
 export function Scenario_Home() {
     group('Home', function () {
-        response = http.get(Base_URL)
+        response = http.get(Base_URL + 'v2')
         check(response, {
-            'status is 200': (r) => r.status === 200,
-            'Homepage has expected test': (r) =>
-                r.body.includes('تست ایرانتیک'),
+            'status is 200': (r) => r.status === 200
         });
-        getStaticResources(Base_URL);
+        response = response.json();
+        check(response, {
+            'success is true': (r) => r.success === true,
+            'meta title is correct': (r) => r.data.metas.title === 'آی تیکت',
+            'popular show exist': (r) => r.data.popular.length > 0
+        });
+        // getStaticResources(Base_URL);
         sleep(1)
     })
 }
 export function Scenario_Schedule() {
-    group('Show',
+    group('Show & Schedule',
         function () {
-            response = http.get(Base_URL + show)
-            check(response, {
-                'Show status is 200': (r) => r.status === 200,
+            response = http.get(Base_URL + `v2/show/places-dates/${show_id}`)
+            checkOutput = check(response, {
+                'status is 200': (r) => r.status === 200
             });
-            sleep(0.3)
-            response = http.get(
-                Base_URL + date, {
-                    headers: {
-                        accept: 'application/json',
-                        authorization: 'Bearer ' + token,
-                    },
-                }
-            )
-            check(response, {
-                'Date status is 200': (r) => r.status === 200,
+            response = response.json();
+            checkOutput = check(response, {
+                'success is true': (r) => r.success === true,
+                'dates received': (r) => r.data.dates.length > 0,
+                'places received': (r) => r.data.places.length > 0,
             });
-            sleep(0.3)
+            if (!checkOutput) {
+                fail('unexpected response');
+            }
+
+            dates = response.data.dates;
+            date = dates[(Math.random() * dates.length) | 0].date;
+            places = response.data.places;
+            place = places[(Math.random() * places.length) | 0].id;
+
+            let _schedules = http.get(Base_URL +
+                `schedule/dates?date=${date}&show_id=${show_id}&place_id=${place}`)
+            checkOutput = check(_schedules, {
+                'schedules status is 200': (s) => s.status === 200
+            });
+
+            _schedules = _schedules.json();
+            checkOutput = check(_schedules, {
+                'success is true': (s) => s.success === true,
+                'code is 20000': (s) => s.code === 20000,
+                'schedules data received': (s) => s.data.length > 0
+            });
+
+            if (!checkOutput) {
+                fail('unexpected response');
+            }
+            schedules = _schedules.data;
         }
     )
 }
+
 export function Scenario_Reserve() {
-    group('Schedule', function () {
-        response = http.get(Base_URL + 'schedule/' + schedule)
-        check(response, {
-            'Schedule status is 200': (r) => r.status === 200,
-        });
-        sleep(1)
+    let schedule_id = schedules[(Math.random() * schedules.length) | 0].id;
+    group('Seat', function () {
 
-        response = http.get(Base_URL + 'api/user/wallet', {
-            headers: {
-                accept: 'application/json',
-                authorization: 'Bearer ' + token,
-            },
-        })
-        check(response, {
-            'Wallet status is 200': (r) => r.status === 200,
+        let _seats = http.get(Base_URL + `v2/schedule/${schedule_id}/seats`)
+        checkOutput = check(seats, {
+            'seats is 200': (s) => s.status === 200,
         });
+        if (!checkOutput) {
+            fail('unexpected response');
+        }
+        seats = _seats.json().data;
 
-        response = http.get(
-            Base_URL + date, {
-                headers: {
-                    accept: 'application/json',
-                    authorization: 'Bearer ' + token,
-                },
-            }
-        )
-        check(response, {
-            'Date status is 200': (r) => r.status === 200,
+        let _seats_status = http.get(Base_URL + `v2/schedule/${schedule_id}/seats-status`)
+        checkOutput = check(seats_status, {
+            'seats_status is 200': (s) => s.status === 200,
         });
+        if (!checkOutput) {
+            fail('unexpected response');
+        }
+        seats_status = _seats_status.json().data;
 
-        seats = http.get(Base_URL + 'api/schedule/' + schedule + '/seats-status')
-        check(seats, {
-            'seats-status is 200': (s) => s.status === 200,
-            'seats-status success is true': (s) => s.json().success === true,
-        });
-        seats = seats.json().data;
+        // response = http.get(Base_URL + 'api/user/wallet', {
+        //     headers: {
+        //         accept: 'application/json',
+        //         authorization: 'Bearer ' + token,
+        //     },
+        // })
+        // check(response, {
+        //     'Wallet status is 200': (r) => r.status === 200,
+        // });
+
+        // response = http.get(
+        //     Base_URL + date, {
+        //         headers: {
+        //             accept: 'application/json',
+        //             authorization: 'Bearer ' + token,
+        //         },
+        //     }
+        // )
+        // check(response, {
+        //     'Date status is 200': (r) => r.status === 200,
+        // });
         sleep(1)
     })
     let order_id = null;
+
     group('Reserve', function () {
-        let freeSeats = Object.entries(seats).filter(([key, value]) => value === 0);
+        let freeSeats = Object.entries(seats_status).filter(([key, value]) => value === 0);
         let keys = Object.keys(freeSeats)
         if (freeSeats.length) {
-            let maxSeats = freeSeats.length > 11 ? 11 : freeSeats.length
-            let randSeats = []
-            for (let i = 1; i < Math.random() * maxSeats; i++) {
+            let maxSeats = (freeSeats.length > 11 ? 11 : freeSeats.length) * Math.random();
+            let randSeats = [];
+            for (let i = 1; i < maxSeats; i++) {
                 let randIndex = Math.floor(Math.random() * keys.length)
                 let randKey = keys[randIndex]
                 randSeats.push(freeSeats[randKey][0])
@@ -162,7 +208,7 @@ export function Scenario_Reserve() {
 
             response = http.post(
                 Base_URL + 'api/order/reserve',
-                `{"seat_ids":[${randSeats}],"schedule_id":"${schedule}","block_ids":{"${blocks[0]}":0,"${blocks[1]}":0},"use_wallet":0,"gateway":"ir_sep_shiraz"}`, {
+                `{"seat_ids":[${randSeats}],"schedule_id":"${schedule_id}","block_ids":{"${blocks[0]}":0}":0},"use_wallet":0,"gateway":"ir_pec"}`, {
                     headers: {
                         accept: 'application/json',
                         authorization: 'Bearer ' + token,
@@ -213,4 +259,24 @@ export function Scenario_Reserve() {
             });
         })
     }
+}
+
+export function Scenario_Login() {
+    group('Login',
+        function () {
+            const payload = JSON.stringify({
+                mobile: mobile
+            });
+            const params = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            response = http.post(Base_URL + 'login/request', payload, params);
+            check(response, {
+                'status is 200': (r) => r.status === 200,
+                'success is true': (r) => r.json().success === true,
+            });
+        }
+    )
 }

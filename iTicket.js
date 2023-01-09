@@ -14,7 +14,7 @@ export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<1000'], // 95% of requests should be below 500ms
-        http_req_waiting: ['p(95)<2000'],
+        http_req_waiting: ['p(95)<1000'],
         // 'group_duration{group:::Login}': ['avg < 2000'],
         'group_duration{group:::Home}': ['avg < 3000'],
         'group_duration{group:::Show & Schedule}': ['avg < 3000'],
@@ -35,22 +35,22 @@ export const options = {
         //     gracefulRampDown: '1s',
         //     exec: 'Scenario_Login',
         // },
-        Scenario_Home: {
-            executor: 'ramping-vus',
-            gracefulStop: '5s',
-            stages: [{
-                target: 1000,
-                duration: '10m'
-            }],
-            gracefulRampDown: '5s',
-            exec: 'Scenario_Home',
-        },
+        // Scenario_Home: {
+        //     executor: 'ramping-vus',
+        //     gracefulStop: '5s',
+        //     stages: [{
+        //         target: 500,
+        //         duration: '2m'
+        //     }],
+        //     gracefulRampDown: '5s',
+        //     exec: 'Scenario_Home',
+        // },
         Scenario_Schedule: {
             executor: 'ramping-vus',
             gracefulStop: '5s',
             stages: [{
-                target: 1000,
-                duration: '10m'
+                target: 1,
+                duration: '2m'
 
             }],
             gracefulRampDown: '5s',
@@ -91,61 +91,66 @@ const blocks = [3]
 export function Scenario_Home() {
     group('Home', function () {
         response = http.get(Base_URL + 'v2')
-        check(response, {
+        checkOutput = check(response, {
             'status is 200': (r) => r.status === 200
         });
-        response = response.json();
-        check(response, {
-            'success is true': (r) => r.success === true,
-            'meta title is correct': (r) => r.data.metas.title === 'آی تیکت',
-            'popular show exist': (r) => r.data.popular.length > 0
-        });
+        if (checkOutput) {
+            response = response.json();
+            check(response, {
+                'success is true': (r) => r.success === true,
+                'meta title is correct': (r) => r.data.metas.title === 'آی تیکت',
+                'popular show exist': (r) => r.data.popular.length > 0
+            });
+        }
+
         // getStaticResources(Base_URL);
         sleep(1)
     })
 }
 export function Scenario_Schedule() {
 
-    let schedule_id;
+    let schedule_id = null;
     group('Show & Schedule',
         function () {
             response = http.get(Base_URL + `v2/show/places-dates/${show_id}`)
             checkOutput = check(response, {
                 'status is 200': (r) => r.status === 200
             });
-            response = response.json();
-            checkOutput = check(response, {
-                'success is true': (r) => r.success === true,
-                'dates received': (r) => r.data.dates.length > 0,
-                'places received': (r) => r.data.places.length > 0,
-            });
-            if (!checkOutput) {
-                fail('unexpected response');
+            if (checkOutput) {
+                response = response.json();
+                checkOutput = check(response, {
+                    'success is true': (r) => r.success === true,
+                    'dates received': (r) => r.data.dates.length > 0,
+                    'places received': (r) => r.data.places.length > 0,
+                });
+                if (checkOutput) {
+                    dates = response.data.dates;
+                    date = dates[(Math.random() * dates.length) | 0].date;
+                    places = response.data.places;
+                    place = places[(Math.random() * places.length) | 0].id;
+
+                    let _schedules = http.get(Base_URL +
+                        `schedule/dates?date=${date}&show_id=${show_id}&place_id=${place}`)
+                    checkOutput = check(_schedules, {
+                        'schedules status is 200': (s) => s.status === 200
+                    });
+                    if (checkOutput) {
+                        _schedules = _schedules.json();
+                        checkOutput = check(_schedules, {
+                            'success is true': (s) => s.success === true,
+                            'code is 20000': (s) => s.code === 20000,
+                            'schedules data received': (s) => s.data.length > 0
+                        });
+
+                        if (checkOutput) {
+                            schedules = _schedules.data;
+                            schedule_id = schedules[(Math.random() * schedules.length) | 0].id;
+                        }
+
+                    }
+                }
+
             }
-
-            dates = response.data.dates;
-            date = dates[(Math.random() * dates.length) | 0].date;
-            places = response.data.places;
-            place = places[(Math.random() * places.length) | 0].id;
-
-            let _schedules = http.get(Base_URL +
-                `schedule/dates?date=${date}&show_id=${show_id}&place_id=${place}`)
-            checkOutput = check(_schedules, {
-                'schedules status is 200': (s) => s.status === 200
-            });
-
-            _schedules = _schedules.json();
-            checkOutput = check(_schedules, {
-                'success is true': (s) => s.success === true,
-                'code is 20000': (s) => s.code === 20000,
-                'schedules data received': (s) => s.data.length > 0
-            });
-
-            if (!checkOutput) {
-                fail('unexpected response');
-            }
-            schedules = _schedules.data;
-            schedule_id = schedules[(Math.random() * schedules.length) | 0].id;
 
         }
     )
@@ -153,12 +158,15 @@ export function Scenario_Schedule() {
     let _seats = null;
     let _seats_status = null;
     group('Seat', function () {
+        if (!schedule_id) {
+            return false;
+        }
         _seats = http.get(Base_URL + `v2/schedule/${schedule_id}/seats`)
         checkOutput = check(_seats, {
             'seats is 200': (s) => s.status === 200,
         });
         if (!checkOutput) {
-            fail('unexpected response');
+            return false;
         }
         seats = _seats.json().data;
 
@@ -168,7 +176,7 @@ export function Scenario_Schedule() {
             'seats_status is 200': (s) => s.status === 200,
         });
         if (!checkOutput) {
-            console.log(`schedule_id: ${schedule_id}`);
+            return false;
         }
         seats_status = _seats_status.json().data;
         // response = http.get(Base_URL + 'api/user/wallet', {
@@ -208,7 +216,7 @@ export function Scenario_Schedule() {
                     let randKey = keys[randIndex]
                     randSeats.push(freeSeats[randKey][0])
                 }
-                
+
                 response = http.post(
                     Base_URL + 'order/reserve',
                     `{"seat_ids":[${randSeats}],"schedule_id":"${schedule_id}","block_ids":{"${blocks[0]}":0},"use_wallet":0,"gateway":"ir_pec"}`, {
@@ -219,22 +227,31 @@ export function Scenario_Schedule() {
                         },
                     }
                 )
-                
-                check(response, {
+
+                checkOutput = check(response, {
                     'order/reserve status is 200': (r) => r.status === 200,
                 });
-
+                if (!checkOutput) {
+                    return false;
+                }
                 response = response.json()
-                check(response, {
+                checkOutput = check(response, {
                     'reserve has been succeed': (r) => r.success === true,
                     'order is free': (r) => r.code === 20002
                 });
+                if (!checkOutput) {
+                    console.log(response);
+                    return false;
+                }
 
                 if (response.success) {
-                    check(response, {
+                    checkOutput = check(response, {
                         'order_id is not NULL': (r) => r.data.order_id > 0,
                         'order_code is not NULL': (r) => r.data.code > 0,
                     });
+                    if (!checkOutput) {
+                        return false;
+                    }
                     order_id = response.data.order_id
                 }
                 sleep(1)

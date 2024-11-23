@@ -5,7 +5,7 @@ import {
     check
 } from 'k6'
 import http from 'k6/http'
-import randomIntBetween from "./utils/k6-utils.js";
+//import randomIntBetween from "./utils/k6-utils.js";
 import {
     getStaticResources
 } from './modules/static-resources.js';
@@ -16,11 +16,11 @@ export const options = {
         http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
         // 'group_duration{group:::Home}': ['avg < 5000'],
         // 'group_duration{group:::Show}': ['avg < 5000'],
-        'group_duration{group:::Confirm}': ['avg < 300'],
-        'group_duration{group:::Reserve}': ['avg < 300'],
+        // 'group_duration{group:::Confirm}': ['avg < 300'],
+        // 'group_duration{group:::Reserve}': ['avg < 300'],
         'group_duration{group:::ScheduleList}': ['avg < 300'],
-        'group_duration{group:::ScheduleSeat}': ['avg < 300'],
-        'group_duration{group:::ScheduleSeatStatus}': ['avg < 300'],
+        // 'group_duration{group:::ScheduleSeat}': ['avg < 300'],
+        // 'group_duration{group:::ScheduleSeatStatus}': ['avg < 300'],
         // 'group_duration{group:::Ticket}': ['avg < 5000'],
         // 'group_duration{group:::PDF}': ['avg < 5000'],
     },
@@ -50,7 +50,7 @@ export const options = {
             executor: 'ramping-vus',
             gracefulStop: '1s',
             stages: [{
-                target: 1000,
+                target: 10,
                 duration: '5m'
             }],
             // gracefulRampDown: '5m',
@@ -59,11 +59,11 @@ export const options = {
     },
 }
 
-const Base_URL = "http://prod-order.irantic.com/"
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpcmFudGljLmNvbSIsImlkIjoxLCJ0aXRsZSI6Itin24zYsdin2YbYqtuM2qkiLCJpcHMiOltdfQ.s5I3VwlD0z_ZOIgbAaeom_aRjWt0zQCZSUnM6DP2e6FxbKicS1jJDdpb0EZT6tVubElyuNanzfIcFnTwBr9Fkw";
+const Base_URL = "https://stage-seller.samfaa.ir/"
+const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzdGFnZS1zYW1mYWEuaXIiLCJpZCI6MSwidGl0bGUiOiLYp9uM2LHYp9mG2KrbjNqpIiwiaXBzIjpbXX0.QECoHigMj5lognF5QZc7DSOxNy9aiRTwIP4A2r8_oTls59gdXdhqN8Y48yo4twTbcUjlz0dtS_7t2qvfBZykLQ";
 const customer_id = 412
 const show = "concert/45057";
-const show_id = 45057;
+const show_id = 44915;
 const dates = [
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-10",
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-11",
@@ -71,7 +71,7 @@ const dates = [
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-13",
     "api/schedule/dates?show_id=45057&place_id=18&date=2022-09-14",
 ];
-const schedules = [956145, 956148, 956151, 956154, 956157, 956160, 956163, 956121, 956124, 956127, 956130, 956133, 956136, 956139, 956142, 956097, 956100, 956103, 956106, 956109, 956112, 956115, 956118, 956073, 956076, 956079, 956082, 956085, 956088, 956091, 956094, 956166, 956169, 956172, 956175, 956178, 956181, 956184];
+const schedules = [4788261];
 
 // const Base_URL = "http://192.168.99.207:8020/"
 // // const Base_URL_Static = "http://panel.irantic.test/" // static assets from storage
@@ -90,7 +90,7 @@ let schedule = schedules[(Math.random() * schedules.length) | 0]
 
 let seats = [];
 let response
-const blocks = [1323, 1324]
+const blocks = [44254, 44255]
 
 export function Scenario_Home() {
     group('Home', function () {

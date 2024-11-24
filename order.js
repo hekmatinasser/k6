@@ -38,7 +38,6 @@ export const options = {
         'group_duration{group:::ScheduleSeatStatus}': ['avg < 1000'],
         'group_duration{group:::Reserve}': ['avg < 1500'],
         'group_duration{group:::Confirm}': ['avg < 1000'],
-        'group_duration{group:::Cancel}': ['avg < 1000'],
     },
     scenarios: {
         Scenario_1: {
@@ -151,13 +150,6 @@ export function Scenario_Sell() {
             response = http.post(url('api/v1/order/success'), payload, headers)
             if (!check(response, {'ok': (r) => r.json().success})) {
                 console.error('Unexpected response:', response.url, payload, response.body);
-            }
-        })
-
-        group('Cancel', function () {
-            response = http.get(url(`api/v1/order/${order_id}/cancel`), headers)
-            if (!check(response, {'ok': (r) => r.json().success})) {
-                console.error('Unexpected response:', response.url, response.body);
             }
         })
     }

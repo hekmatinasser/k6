@@ -1,3 +1,13 @@
+const variable = JSON.parse(open('./../env.json'))
+
+export function url(path) {
+    return variable.baseUrl + (path ? path : '');
+}
+
+export function env(key) {
+    return variable[key];
+}
+
 export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         let r = Math.random() * 16 | 0,
@@ -17,6 +27,8 @@ export function randomItem(arrayOfItems) {
 export function randomString(length) {
     const charset = 'abcdefghijklmnopqrstuvwxyz';
     let res = '';
-    while (length--) res += charset[Math.random() * charset.length | 0];
+    while (length--) {
+        res += charset[Math.random() * charset.length | 0]
+    }
     return res;
 }

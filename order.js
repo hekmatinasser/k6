@@ -8,11 +8,11 @@ import http from 'k6/http'
 import {randomItem, url, env} from "./utils/k6-utils.js";
 
 
-const show_id = 44915;
+const show_id = env('show');
 
-const schedules = [4788261];
+const schedules = env('schedules').split(',');
 
-let schedule_id = schedules[0]
+let schedule_id = randomItem(schedules)
 
 let seats = [];
 let blocks = []
@@ -43,10 +43,15 @@ export const options = {
         Scenario_1: {
             executor: 'ramping-vus',
             gracefulStop: '1m',
-            stages: [{
-                target: 100,
-                duration: '1m'
-            }],
+            stages: [
+                { duration: '30s', target: 1000 },
+                { duration: '30s', target: 2000 },
+                { duration: '60s', target: 3000 },
+                { duration: '60s', target: 2500 },
+                { duration: '60s', target: 2000 },
+                { duration: '60s', target: 1000 },
+                { duration: '30s', target: 0 },
+            ],
             gracefulRampDown: '1m',
             exec: 'Scenario_Sell',
         },

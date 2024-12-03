@@ -1,11 +1,21 @@
-const variable = JSON.parse(open('./../env.json'))
+const _env = __ENV.env ?  __ENV.env : 'dev'
+
+const variable = JSON.parse(open(`./../${_env}.env.json`))
+
 
 export function url(path) {
     return variable.baseUrl + (path ? path : '');
 }
 
-export function env(key) {
-    return variable[key];
+export function env(key, byDefault) {
+    return variable.hasOwnProperty(key) ? variable[key] : byDefault;
+}
+
+export function info() {
+    if (__VU === 1 && __ITER === 0) {
+        console.info(`environment: ${_env}`);
+        console.info(`base url: ${env('baseUrl')}\n`);
+    }
 }
 
 export function uuidv4() {

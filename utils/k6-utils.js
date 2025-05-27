@@ -16,13 +16,6 @@ export function environment() {
     return _env;
 }
 
-export function info() {
-    if (__VU === 1 && __ITER === 0) {
-        console.info(`environment: ${_env}`);
-        console.info(`base url: ${env('baseUrl')}\n`);
-    }
-}
-
 export function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         let r = Math.random() * 16 | 0,

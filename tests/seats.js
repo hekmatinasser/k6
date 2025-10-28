@@ -4,6 +4,9 @@ import http from 'k6/http'
 
 import {randomItem, url, env, environment} from "../utils/k6-utils.js";
 
+const schedules = env('schedules');
+const schedule_id = randomItem(schedules)
+
 const headers = {
     "headers": {
         "accept": "application/json",
@@ -17,6 +20,7 @@ export function setup() {
     console.info(`base url: ${env('baseUrl')}\n`);
 
     let data = {
+        'schedule_id': schedule_id
     };
 
     return data;
@@ -27,10 +31,10 @@ export const options = {
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<2000'], // 95% of requests should be below 2000ms
-        'group_duration{group:::Profile}': ['avg < 1500'],
+        'group_duration{group:::ScheduleSeats}': ['avg < 1500'],
     },
     scenarios: {
-        Seller: {
+        ScheduleSeats: {
             executor: 'ramping-vus',
             gracefulStop: '1m',
             stages: [
@@ -43,15 +47,15 @@ export const options = {
                 {duration: '30s', target: 10},
             ],
             gracefulRampDown: '1m',
-            exec: 'Seller',
+            exec: 'Schedule',
         },
     }
 }
 
-export function Seller(data) {
+export function Schedule(data) {
 
-    group('Profile', function () {
-        let response = http.get(url(`api/v1/profile`), headers)
+    group('ScheduleSeats', function () {
+        let response = http.get(url(`api/v1/schedule/${data.schedule_id}/seats`), headers)
         if (!check(response, {'ok': (r) => r.json().success})) {
             console.error('Unexpected response:', response.url, response.body);
         }
